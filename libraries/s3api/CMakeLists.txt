@@ -4,7 +4,7 @@ find_package(Pugixml REQUIRED)
 
 userver_module(lib-s3api
     SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
-    LINK_LIBRARIES_PRIVATE pugixml
+    LINK_LIBRARIES_PRIVATE Pugixml
     UTEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*_test.cpp"
 )
 
