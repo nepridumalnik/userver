@@ -35,7 +35,7 @@ jobs:
             if: matrix.os == 'macos-latest'
             run: |
                 brew install postgresql
-                sudo port deactivate libiconv  # https://stackoverflow.com/questions/57734434/libiconv-or-iconv-undefined-symbol-on-mac-osx
+                brew install libiconv  # https://stackoverflow.com/questions/57734434/libiconv-or-iconv-undefined-symbol-on-mac-osx
 
           - name: Install common packages
             run: |
