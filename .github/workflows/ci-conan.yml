@@ -18,7 +18,11 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                os: [ubuntu-22.04, macos-latest]
+                include:
+                  - os: ubuntu-22.04
+                    conanflags: ''
+                  - os: macos-latest
+                    conanflags: '-o with_grpc=false'
 
         steps:
           - name: Checkout
@@ -44,11 +48,6 @@ jobs:
                 conan profile detect
                 conan profile show
 
-          - name: Run conan MacOS
-            if: matrix.os == 'macos-latest'
-            run: |
-                conan create . --build=missing -s:a compiler.cppstd=17 -pr:b=default -o with_grpc=false -tf conan/test_package/
           - name: Run conan
-            if: matrix.os != 'macos-latest'
             run: |
-                conan create . --build=missing -s:a compiler.cppstd=17 -pr:b=default -tf conan/test_package/
+                conan create . --build=missing -s:a compiler.cppstd=17 -pr:b=default ${{matrix.conanflags}} -tf conan/test_package/
