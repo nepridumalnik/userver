@@ -47,7 +47,7 @@ jobs:
           - name: Run conan MacOS
             if: matrix.os == 'macos-latest'
             run: |
-                conan create . --build=missing -s:a compiler.cppstd=17 -pr:b=default --with_grpc=false -tf conan/test_package/
+                conan create . --build=missing -s:a compiler.cppstd=17 -pr:b=default -o with_grpc=false -tf conan/test_package/
           - name: Run conan
             if: matrix.os != 'macos-latest'
             run: |
