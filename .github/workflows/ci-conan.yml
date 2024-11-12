@@ -22,7 +22,7 @@ jobs:
                   - os: ubuntu-22.04
                     conanflags: '-tf conan/test_package/'
                   - os: macos-latest
-                    conanflags: '-o with_grpc=False -o with_otlp=False'
+                    conanflags: ''
 
         steps:
           - name: Checkout
