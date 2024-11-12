@@ -20,9 +20,9 @@ jobs:
             matrix:
                 include:
                   - os: ubuntu-22.04
-                    conanflags: ''
+                    conanflags: '-tf conan/test_package/'
                   - os: macos-latest
-                    conanflags: '-o with_grpc=False -o with_otlp=False -o with_postgresql_extra=False'
+                    conanflags: '-o with_grpc=False -o with_otlp=False'
 
         steps:
           - name: Checkout
@@ -50,4 +50,4 @@ jobs:
 
           - name: Run conan
             run: |
-                conan create . --build=missing -s:a compiler.cppstd=17 -pr:b=default ${{matrix.conanflags}} -tf conan/test_package/
+                conan create . --build=missing -s:a compiler.cppstd=17 -pr:b=default ${{matrix.conanflags}}
