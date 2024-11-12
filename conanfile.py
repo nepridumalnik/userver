@@ -421,6 +421,9 @@ class UserverConan(ConanFile):
         def yaml():
             return ['yaml-cpp::yaml-cpp']
 
+        def iconv():
+            return ['libiconv::libiconv']
+
         def libev():
             return ['libev::libev']
 
@@ -501,6 +504,7 @@ class UserverConan(ConanFile):
                     + boost()
                     + concurrentqueue()
                     + yaml()
+                    + iconv()
                     + libev()
                     + libnghttp2()
                     + curl()
