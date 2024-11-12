@@ -281,6 +281,7 @@ class UserverConan(ConanFile):
             'UserverSetupEnvironment',
             'SetupLinker',
             'SetupLTO',
+            'SetupPGO',
             'UserverVenv',
         ):
             copy(
