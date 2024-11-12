@@ -44,6 +44,9 @@ jobs:
                 brew install $(cat scripts/docs/en/deps/macos.md)
                 brew install clang-format
                 brew link postgresql@16
+                brew upgrade
+                
+                xcode-select --install
 
           - name: Run cmake
             run: |
