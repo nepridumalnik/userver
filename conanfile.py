@@ -1,5 +1,6 @@
 # pylint: disable=no-member
 import os
+import platform
 import re
 
 from conan import ConanFile
@@ -10,7 +11,6 @@ from conan.tools.cmake import CMakeDeps
 from conan.tools.cmake import CMakeToolchain
 from conan.tools.files import copy
 from conan.tools.files import load
-from conan.tools import detected_os
 
 required_conan_version = '>=2.8.0'  # pylint: disable=invalid-name
 
@@ -48,7 +48,7 @@ class UserverConan(ConanFile):
     default_options = {
         'fPIC': True,
         'lto': False,
-        'with_jemalloc': (detected_os() != "Macos"),
+        'with_jemalloc': (platform.system() != "Darwin"),
         'with_mongodb': True,
         'with_postgresql': True,
         'with_postgresql_extra': False,
