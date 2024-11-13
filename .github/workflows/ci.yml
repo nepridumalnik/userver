@@ -218,7 +218,7 @@ jobs:
                 cmake ${{matrix.cmake-flags}} ..
 
           - name: Run clang-tidy
-            if: matrix.info == 'clang-14 + debug + sanitize addr+ub'
+            if: matrix.info == 'clang-18 + debug + sanitize addr+ub'
             run: |
                 [[ -z "${GITHUB_BASE_REF}" ]] && BRANCH_VAR=HEAD~1 || BRANCH_VAR=origin/${GITHUB_BASE_REF}
                 echo "${BRANCH_VAR}"
@@ -227,9 +227,9 @@ jobs:
                 LIST_CHECK_FILES=$(git diff --name-only ${BRANCH_VAR} | grep --color=never '.cpp' | grep -v ${EXCLUDE_PATTERNS} | tr '\n' ' ')
                 if [[ -n ${LIST_CHECK_FILES} ]]
                 then
-                  sudo apt install -y clang-tidy-14
-                  curl -o tools/run-clang-tidy https://raw.githubusercontent.com/llvm-mirror/clang-tools-extra/release_90/clang-tidy/tool/run-clang-tidy.py
-                  python3 ./tools/run-clang-tidy -clang-tidy-binary clang-tidy-14 -p build_debug -q -j$(nproc) ${LIST_CHECK_FILES}
+                  sudo apt install -y clang-tidy-18
+                  curl -o tools/run-clang-tidy https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/release/18.x/clang-tools-extra/clang-tidy/tool/run-clang-tidy.py
+                  python3 ./tools/run-clang-tidy -clang-tidy-binary clang-tidy-18 -p build_debug -q -j$(nproc) ${LIST_CHECK_FILES}
                 else
                   echo "Nothing check in clang-tidy"
                 fi
