@@ -20,9 +20,9 @@ jobs:
             matrix:
                 include:
                   - os: ubuntu-22.04
-                    conanflags: '-tf conan/test_package/'
-                  - os: macos-latest
                     conanflags: ''
+                  - os: macos-latest
+                    conanflags: '-o with_jemalloc=False'
 
         steps:
           - name: Checkout
@@ -50,4 +50,4 @@ jobs:
 
           - name: Run conan
             run: |
-                conan create . --build=missing -s:a compiler.cppstd=17 -pr:b=default ${{matrix.conanflags}}
+                conan create . --build=missing -s:a compiler.cppstd=17 -pr:b=default ${{matrix.conanflags}} -tf conan/test_package/
