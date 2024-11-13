@@ -22,7 +22,7 @@ jobs:
                   - os: ubuntu-22.04
                     conanflags: ''
                   - os: macos-latest
-                    conanflags: '-o with_jemalloc=False'
+                    conanflags: ''
 
         steps:
           - name: Checkout
