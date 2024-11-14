@@ -22,7 +22,7 @@ jobs:
                   - os: ubuntu-22.04
                     conanflags: ''
                   - os: macos-latest
-                    conanflags: ''
+                    conanflags: '-o python_path=python3.11'
 
         steps:
           - name: Checkout
@@ -38,8 +38,10 @@ jobs:
           - name: Install MacOS packages
             if: matrix.os == 'macos-latest'
             run: |
+                brew update
                 brew install postgresql
                 brew install libiconv  # https://stackoverflow.com/questions/57734434/libiconv-or-iconv-undefined-symbol-on-mac-osx
+                brew install python@3.11
 
           - name: Install common packages
             run: |
