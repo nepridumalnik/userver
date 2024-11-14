@@ -50,4 +50,4 @@ jobs:
 
           - name: Compile
             run: |
-                cmake --build build_debug -j$(nproc) -- -k
+                cmake --build build_debug -j$(nproc) -- -k=1
