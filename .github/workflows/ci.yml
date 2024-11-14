@@ -229,7 +229,7 @@ jobs:
                 then
                   sudo apt install -y clang-tidy-18
                   curl -o tools/run-clang-tidy https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/release/18.x/clang-tools-extra/clang-tidy/tool/run-clang-tidy.py
-                  python3 ./tools/run-clang-tidy -clang-tidy-binary clang-tidy-18 -p build_debug -q -j$(nproc) ${LIST_CHECK_FILES}
+                  python3 ./tools/run-clang-tidy -config-file ./.clang-tidy -clang-tidy-binary clang-tidy-18 -p build_debug -q -j$(nproc) ${LIST_CHECK_FILES}
                 else
                   echo "Nothing check in clang-tidy"
                 fi
