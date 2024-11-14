@@ -15,7 +15,6 @@
 #include <samples_postgres_service/sql_queries.hpp>
 
 namespace samples_postgres_service::pg {
-
 class KeyValue final : public server::handlers::HttpHandlerBase {
 public:
     static constexpr std::string_view kName = "handler-key-value";
@@ -32,7 +31,6 @@ private:
 
     storages::postgres::ClusterPtr pg_cluster_;
 };
-
 }  // namespace samples_postgres_service::pg
 /// [Postgres service sample - component]
 
