@@ -43,6 +43,7 @@ class UserverConan(ConanFile):
         'namespace': ['ANY'],
         'namespace_begin': ['ANY'],
         'namespace_end': ['ANY'],
+        'python_path': ['ANY'],
     }
 
     default_options = {
@@ -62,6 +63,7 @@ class UserverConan(ConanFile):
         'namespace': 'userver',
         'namespace_begin': 'namespace userver {',
         'namespace_end': '}',
+        'python_path': 'python3',
         'mongo-c-driver/*:with_sasl': 'cyrus',
         'grpc/*:php_plugin': False,
         'grpc/*:node_plugin': False,
@@ -194,6 +196,7 @@ class UserverConan(ConanFile):
             self.options.namespace_begin
         )
         tool_ch.variables['USERVER_NAMESPACE_END'] = self.options.namespace_end
+        tool_ch.variables['USERVER_PYTHON_PATH'] = self.options.python_path
 
         tool_ch.variables['USERVER_LTO'] = self.options.lto
         tool_ch.variables['USERVER_FEATURE_JEMALLOC'] = (
