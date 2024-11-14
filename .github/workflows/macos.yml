@@ -8,10 +8,6 @@ name: CI
           - develop
           - feature/**
 
-env:
-    UBSAN_OPTIONS: print_stacktrace=1
-    ASAN_OPTIONS: detect_odr_violation=2
-
 jobs:
     macos:
         name: MacOS (build only)
@@ -54,4 +50,4 @@ jobs:
 
           - name: Compile
             run: |
-                cmake --build build_debug -j$(nproc) -k
+                cmake --build build_debug -j$(nproc) -- -k
