@@ -645,7 +645,6 @@ class UserverConan(ConanFile):
         debug = (
             'd'
             if self.settings.build_type == 'Debug'
-            and self.settings.os == 'Windows'
             else ''
         )
 
