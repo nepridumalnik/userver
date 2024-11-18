@@ -14,15 +14,20 @@ env:
 jobs:
     build:
         runs-on: ${{ matrix.os }}
-        name: ${{ matrix.os }}
+        name: '${{ matrix.os }} ({{ matrix.build-type }})'
         strategy:
             fail-fast: false
             matrix:
                 include:
                   - os: ubuntu-22.04
                     conanflags: ''
+                    build-type: Release
+                  - os: ubuntu-22.04
+                    conanflags: ''
+                    build-type: Debug
                   - os: macos-latest
                     conanflags: '-o python_path=python3.11'
+                    build-type: Release
 
         steps:
           - name: Checkout
@@ -52,4 +57,4 @@ jobs:
 
           - name: Run conan
             run: |
-                conan create . --build=missing -s:a compiler.cppstd=17 -pr:b=default ${{matrix.conanflags}} -tf conan/test_package/
+                conan create . --build=missing --settings=build_type=${{matrix.build-type}} -s:a compiler.cppstd=17 -pr:b=default ${{matrix.conanflags}} -tf conan/test_package/
