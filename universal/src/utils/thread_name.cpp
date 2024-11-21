@@ -27,19 +27,17 @@ constexpr std::size_t kMaxThreadNameLen = 15;  // + '\0'
 }  // namespace
 
 std::string GetCurrentThreadName() {
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
-
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
     std::array<char, kMaxThreadNameLen + 1> buf;
 
 #ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+    int ret = ::pthread_getname_np(::pthread_self(), buf.data(), buf.size());
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
-
-    int ret = ::pthread_getname_np(::pthread_self(), buf.data(), buf.size());
     if (ret) {
         throw std::system_error(ret, std::system_category(), "Cannot get thread name");
     }
