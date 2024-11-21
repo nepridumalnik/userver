@@ -30,12 +30,12 @@ std::string GetCurrentThreadName() {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
     std::array<char, kMaxThreadNameLen + 1> buf;
 
-#ifdef __GNUC__
+#if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
     int ret = ::pthread_getname_np(::pthread_self(), buf.data(), buf.size());
-#ifdef __GNUC__
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
     if (ret) {
