@@ -276,7 +276,10 @@ void Configuration::SetOption(const char* option, const char* value, T to_print)
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
     const rd_kafka_conf_res_t err = rd_kafka_conf_set(conf_.GetHandle(), option, value, err_buf.data(), err_buf.size());
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
 #endif
     if (err == RD_KAFKA_CONF_OK) {
         LOG_INFO() << fmt::format("Kafka conf option: '{}' -> '{}'", option, to_print);
