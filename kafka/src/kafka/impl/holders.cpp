@@ -73,9 +73,15 @@ struct KafkaClientHolder<client_type>::Impl {
 
               const auto rd_kafka_client_type =
                   client_type == ClientType::kConsumer ? RD_KAFKA_CONSUMER : RD_KAFKA_PRODUCER;
-
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
               HolderBase<rd_kafka_t, &rd_kafka_destroy> holder{
                   rd_kafka_new(rd_kafka_client_type, conf.GetHandle(), err_buf.data(), err_buf.size())};
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
               if (!holder) {
                   /// @note `librdkafka` takes ownership on conf iff
                   /// `rd_kafka_new` succeeds
