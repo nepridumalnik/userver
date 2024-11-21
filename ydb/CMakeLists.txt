@@ -22,8 +22,6 @@ userver_module(ydb
     UTEST_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/tests"
     NO_INSTALL  # TODO
 )
-target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-defaulted-function-deleted")
-target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-error=logical-op-parentheses")
 
 # Enforce that userver-ydb requires C++20
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
