@@ -5,13 +5,30 @@
 #include <fmt/format.h>
 #include <librdkafka/rdkafka.h>
 
+#include <userver/logging/log.hpp>
 #include <userver/utils/assert.hpp>
 
 #include <kafka/impl/error_buffer.hpp>
+#include <kafka/impl/log_level.hpp>
+
+#include <fmt/format.h>
 
 USERVER_NAMESPACE_BEGIN
 
 namespace kafka::impl {
+
+namespace {
+
+/// @brief Redirect `librdkafka` logs to `userver` logs.
+///
+/// @see
+/// https://docs.confluent.io/platform/current/clients/librdkafka/html/rdkafka_8h.html#a06ade2ca41f32eb82c6f7e3d4acbe19f
+void KafkaLogCallback([[maybe_unused]] const rd_kafka_t*, int level, const char* facility, const char* message)
+    noexcept {
+    LOG(convertRdKafkaLogLevelToLoggingLevel(level)) << fmt::format("facility: {}, message: {}", facility, message);
+}
+
+}  // namespace
 
 template <class T, DeleterType<T> Deleter>
 HolderBase<T, Deleter>::HolderBase(T* data) : ptr_(data, Deleter) {}
@@ -52,7 +69,7 @@ struct ConfHolder::Impl {
     HolderBase<rd_kafka_conf_s, &rd_kafka_conf_destroy> conf;
 };
 
-ConfHolder::ConfHolder(rd_kafka_conf_t* conf) : impl_(conf) {}
+ConfHolder::ConfHolder(rd_kafka_conf_t* conf) : impl_(conf) { rd_kafka_conf_set_log_cb(conf, KafkaLogCallback); }
 
 ConfHolder::ConfHolder(const ConfHolder& other) : impl_(rd_kafka_conf_dup(other.GetHandle())) {}
 

@@ -16,21 +16,12 @@
 #include <userver/yaml_config/yaml_config.hpp>
 
 #include <kafka/impl/error_buffer.hpp>
-#include <kafka/impl/log_level.hpp>
 
 USERVER_NAMESPACE_BEGIN
 
 namespace kafka::impl {
 
 namespace {
-
-/// @brief Redirect `librdkafka` logs to `userver` logs.
-///
-/// @see
-/// https://docs.confluent.io/platform/current/clients/librdkafka/html/rdkafka_8h.html#a06ade2ca41f32eb82c6f7e3d4acbe19f
-void KafkaLogCallback([[maybe_unused]] const rd_kafka_t*, int level, const char* fac, const char* buf) noexcept {
-    LOG(userver::kafka::impl::convertRdKafkaLogLevelToLoggingLevel(level)) << fac << buf;
-}
 
 template <class SupportedList>
 bool IsSupportedOption(const SupportedList& supported_options, const std::string& configured_option) {
@@ -54,8 +45,8 @@ void VerifyComponentNamePrefix(const std::string& component_name, const std::str
     // producer's component should start with kafka-producer, consumer's - with
     // kafka-consumer
     if (component_name.rfind(expected_prefix) != 0) {
-        throw std::runtime_error{
-            fmt::format("Component '{}' doesn't start with '{}'", component_name, expected_prefix)};
+        throw std::runtime_error{fmt::format("Component '{}' doesn't start with '{}'", component_name, expected_prefix)
+        };
     }
 }
 
@@ -122,7 +113,8 @@ SecurityConfiguration Parse(const yaml_config::YamlConfig& config, formats::pars
 
         security.security_protocol.emplace<SecurityConfiguration::SaslSsl>(SecurityConfiguration::SaslSsl{
             /*security_mechanism=*/mechanism,
-            /*ssl_ca_location=*/config["ssl_ca_location"].As<std::string>()});
+            /*ssl_ca_location=*/config["ssl_ca_location"].As<std::string>()
+        });
     }
 
     return security;
@@ -291,8 +283,6 @@ void Configuration::SetOption(const char* option, const char* value, T to_print)
 #pragma GCC diagnostic pop
 #endif
     if (err == RD_KAFKA_CONF_OK) {
-        rd_kafka_conf_set_log_cb(conf_.GetHandle(), KafkaLogCallback);
-
         LOG_INFO() << fmt::format("Kafka conf option: '{}' -> '{}'", option, to_print);
         return;
     }
