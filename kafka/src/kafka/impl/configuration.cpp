@@ -16,12 +16,21 @@
 #include <userver/yaml_config/yaml_config.hpp>
 
 #include <kafka/impl/error_buffer.hpp>
+#include <kafka/impl/log_level.hpp>
 
 USERVER_NAMESPACE_BEGIN
 
 namespace kafka::impl {
 
 namespace {
+
+/// @brief Redirect `librdkafka` logs to `userver` logs.
+///
+/// @see
+/// https://docs.confluent.io/platform/current/clients/librdkafka/html/rdkafka_8h.html#a06ade2ca41f32eb82c6f7e3d4acbe19f
+void KafkaLogCallback([[maybe_unused]] const rd_kafka_t*, int level, const char* fac, const char* buf) noexcept {
+    LOG(userver::kafka::impl::convertRdKafkaLogLevelToLoggingLevel(level)) << fac << buf;
+}
 
 template <class SupportedList>
 bool IsSupportedOption(const SupportedList& supported_options, const std::string& configured_option) {
@@ -282,6 +291,8 @@ void Configuration::SetOption(const char* option, const char* value, T to_print)
 #pragma GCC diagnostic pop
 #endif
     if (err == RD_KAFKA_CONF_OK) {
+        rd_kafka_conf_set_log_cb(conf_.GetHandle(), KafkaLogCallback);
+
         LOG_INFO() << fmt::format("Kafka conf option: '{}' -> '{}'", option, to_print);
         return;
     }
