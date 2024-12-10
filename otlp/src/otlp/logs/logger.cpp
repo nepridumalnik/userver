@@ -230,10 +230,10 @@ void Logger::SendingLoop(Queue::Consumer& consumer, LogClient& log_client, Trace
             );
         } while (consumer.Pop(action, deadline));
 
-        if (config_.logs_sink & SinkType::kOtlp) {
+        if (static_cast<uint8_t>(config_.logs_sink) & static_cast<uint8_t>(SinkType::kOtlp)) {
             DoLog(log_request, log_client);
         }
-        if (config_.tracing_sink & SinkType::kOtlp) {
+        if (static_cast<uint8_t>(config_.tracing_sink) & static_cast<uint8_t>(SinkType::kOtlp)) {
             DoTrace(trace_request, trace_client);
         }
     }
