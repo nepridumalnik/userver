@@ -17,7 +17,11 @@ USERVER_NAMESPACE_BEGIN
 
 namespace otlp {
 
-enum class SinkType { kBoth, kDefault, kOtlp };
+enum class SinkType : uint8_t {
+    kDefault = 0x1,
+    kOtlp = 0x2,
+    kBoth = kDefault | kOtlp,
+};
 
 SinkType Parse(const yaml_config::YamlConfig& value, formats::parse::To<SinkType>);
 

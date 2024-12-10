@@ -230,10 +230,10 @@ void Logger::SendingLoop(Queue::Consumer& consumer, LogClient& log_client, Trace
             );
         } while (consumer.Pop(action, deadline));
 
-        if (config_.logs_sink == SinkType::kBoth || config_.logs_sink == SinkType::kOtlp) {
+        if (config_.logs_sink & SinkType::kOtlp) {
             DoLog(log_request, log_client);
         }
-        if (config_.tracing_sink == SinkType::kBoth || config_.tracing_sink == SinkType::kOtlp) {
+        if (config_.tracing_sink & SinkType::kOtlp) {
             DoTrace(trace_request, trace_client);
         }
     }
