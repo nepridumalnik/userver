@@ -13,44 +13,44 @@ Paths to dependencies start from the @ref service_templates "directory of your s
 @anchor ubuntu_24_04
 ### Ubuntu 24.04 (Noble Numbat)
 
-\b Dependencies: @ref scripts/docs/en/deps/ubuntu-24.04.md "third_party/userver/scripts/docs/en/deps/ubuntu-24.04.md"
+\b Dependencies: @ref scripts/docs/en/deps/ubuntu-24.04.md "scripts/docs/en/deps/ubuntu-24.04.md"
 
 Dependencies could be installed via:
 
 ```bash
-sudo apt install --allow-downgrades -y $(cat third_party/userver/scripts/docs/en/deps/ubuntu-24.04.md | tr '\n' ' ')
+sudo apt install --allow-downgrades -y $(cat scripts/docs/en/deps/ubuntu-24.04.md | tr '\n' ' ')
 ```
 
 @anchor ubuntu_22_04
 ### Ubuntu 22.04 (Jammy Jellyfish)
 
-\b Dependencies: @ref scripts/docs/en/deps/ubuntu-22.04.md "third_party/userver/scripts/docs/en/deps/ubuntu-22.04.md"
+\b Dependencies: @ref scripts/docs/en/deps/ubuntu-22.04.md "scripts/docs/en/deps/ubuntu-22.04.md"
 
 Dependencies could be installed via:
 
 ```bash
-sudo apt install --allow-downgrades -y $(cat third_party/userver/scripts/docs/en/deps/ubuntu-22.04.md | tr '\n' ' ')
+sudo apt install --allow-downgrades -y $(cat scripts/docs/en/deps/ubuntu-22.04.md | tr '\n' ' ')
 ```
 
 ### Ubuntu 21.10 (Impish Indri)
 
-\b Dependencies: @ref scripts/docs/en/deps/ubuntu-21.10.md "third_party/userver/scripts/docs/en/deps/ubuntu-21.10.md"
+\b Dependencies: @ref scripts/docs/en/deps/ubuntu-21.10.md "scripts/docs/en/deps/ubuntu-21.10.md"
 
 Dependencies could be installed via:
 
 ```bash
-sudo apt install --allow-downgrades -y $(cat third_party/userver/scripts/docs/en/deps/ubuntu-21.10.md | tr '\n' ' ')
+sudo apt install --allow-downgrades -y $(cat scripts/docs/en/deps/ubuntu-21.10.md | tr '\n' ' ')
 ```
 
 
 ### Ubuntu 20.04 (Focal Fossa)
 
-\b Dependencies: @ref scripts/docs/en/deps/ubuntu-20.04.md "third_party/userver/scripts/docs/en/deps/ubuntu-20.04.md"
+\b Dependencies: @ref scripts/docs/en/deps/ubuntu-20.04.md "scripts/docs/en/deps/ubuntu-20.04.md"
 
 Dependencies could be installed via:
 
 ```bash
-sudo apt install --allow-downgrades -y $(cat third_party/userver/scripts/docs/en/deps/ubuntu-20.04.md | tr '\n' ' ')
+sudo apt install --allow-downgrades -y $(cat scripts/docs/en/deps/ubuntu-20.04.md | tr '\n' ' ')
 ```
 
 \b Recommended \b Makefile.local:
@@ -64,12 +64,12 @@ CMAKE_COMMON_FLAGS += \
 
 ### Ubuntu 18.04 (Bionic Beaver)
 
-\b Dependencies: @ref scripts/docs/en/deps/ubuntu-18.04.md "third_party/userver/scripts/docs/en/deps/ubuntu-18.04.md"
+\b Dependencies: @ref scripts/docs/en/deps/ubuntu-18.04.md "scripts/docs/en/deps/ubuntu-18.04.md"
 
 Dependencies could be installed via:
   ```
   bash
-  sudo apt install --allow-downgrades -y $(cat third_party/userver/scripts/docs/en/deps/ubuntu-18.04.md | tr '\n' ' ')
+  sudo apt install --allow-downgrades -y $(cat scripts/docs/en/deps/ubuntu-18.04.md | tr '\n' ' ')
   ```
 
 \b Recommended \b Makefile.local:
@@ -86,12 +86,12 @@ CMAKE_COMMON_FLAGS += \
 
 ### Debian 11
 
-\b Dependencies: @ref scripts/docs/en/deps/debian-11.md "third_party/userver/scripts/docs/en/deps/debian-11.md"
+\b Dependencies: @ref scripts/docs/en/deps/debian-11.md "scripts/docs/en/deps/debian-11.md"
 
 
 ### Debian 11 32-bit
 
-\b Dependencies: @ref scripts/docs/en/deps/debian-11.md "third_party/userver/scripts/docs/en/deps/debian-11.md" (same as above)
+\b Dependencies: @ref scripts/docs/en/deps/debian-11.md "scripts/docs/en/deps/debian-11.md" (same as above)
 
 \b Recommended \b Makefile.local:
 
@@ -103,12 +103,12 @@ CMAKE_COMMON_FLAGS += \
 
 ### Fedora 35
 
-\b Dependencies: @ref scripts/docs/en/deps/fedora-36.md "third_party/userver/scripts/docs/en/deps/fedora-35.md"
+\b Dependencies: @ref scripts/docs/en/deps/fedora-36.md "scripts/docs/en/deps/fedora-35.md"
 
 Fedora dependencies could be installed via:
 
 ```bash
-sudo dnf install -y $(cat third_party/userver/scripts/docs/en/deps/fedora-35.md | tr '\n' ' ')
+sudo dnf install -y $(cat scripts/docs/en/deps/fedora-35.md | tr '\n' ' ')
 ```
 
 \b Recommended \b Makefile.local:
@@ -121,12 +121,12 @@ CMAKE_COMMON_FLAGS += \
 
 ### Fedora 36
 
-\b Dependencies: @ref scripts/docs/en/deps/fedora-36.md "third_party/userver/scripts/docs/en/deps/fedora-36.md"
+\b Dependencies: @ref scripts/docs/en/deps/fedora-36.md "scripts/docs/en/deps/fedora-36.md"
 
 Fedora dependencies could be installed via:
 
 ```bash
-sudo dnf install -y $(cat third_party/userver/scripts/docs/en/deps/fedora-36.md | tr '\n' ' ')
+sudo dnf install -y $(cat scripts/docs/en/deps/fedora-36.md | tr '\n' ' ')
 ```
 
 \b Recommended \b Makefile.local:
@@ -139,7 +139,7 @@ CMAKE_COMMON_FLAGS += \
 
 ### Gentoo
 
-\b Dependencies: @ref scripts/docs/en/deps/gentoo.md "third_party/userver/scripts/docs/en/deps/gentoo.md"
+\b Dependencies: @ref scripts/docs/en/deps/gentoo.md "scripts/docs/en/deps/gentoo.md"
 
 Dependencies could be installed via:
 
@@ -157,7 +157,7 @@ CMAKE_COMMON_FLAGS += \
 
 ### Alpine
 
-\b Dependencies: @ref scripts/docs/en/deps/alpine.md "third_party/userver/scripts/docs/en/deps/alpine.md"
+\b Dependencies: @ref scripts/docs/en/deps/alpine.md "scripts/docs/en/deps/alpine.md"
 
 Dependencies could be installed via:
 
@@ -179,19 +179,19 @@ CMAKE_COMMON_FLAGS += \
 
 ### Arch, Manjaro
 
-\b Dependencies: @ref scripts/docs/en/deps/arch.md "third_party/userver/scripts/docs/en/deps/arch.md"
+\b Dependencies: @ref scripts/docs/en/deps/arch.md "scripts/docs/en/deps/arch.md"
 
 Using an AUR helper (pikaur in this example) the dependencies could be installed as:
 
 ```bash
-pikaur -S $(cat third_party/userver/scripts/docs/en/deps/arch.md | sed 's/^makepkg|//g' | tr '\n' ' ')
+pikaur -S $(cat scripts/docs/en/deps/arch.md | sed 's/^makepkg|//g' | tr '\n' ' ')
 ```
 
 Without AUR:
 
 ```bash
-sudo pacman -S $(cat third_party/userver/scripts/docs/en/deps/arch.md | grep -v -- 'makepkg|' | tr '\n' ' ')
-cat third_party/userver/scripts/docs/en/deps/arch.md | grep -oP '^makepkg\|\K.*' | while read ;\
+sudo pacman -S $(cat scripts/docs/en/deps/arch.md | grep -v -- 'makepkg|' | tr '\n' ' ')
+cat scripts/docs/en/deps/arch.md | grep -oP '^makepkg\|\K.*' | while read ;\
   do \
     DIR=$(mktemp -d) ;\
     git clone https://aur.archlinux.org/$REPLY.git $DIR ;\
@@ -212,7 +212,7 @@ CMAKE_COMMON_FLAGS += \
 
 ### MacOS
 
-\b Dependencies: @ref scripts/docs/en/deps/macos.md "third_party/userver/scripts/docs/en/deps/macos.md".
+\b Dependencies: @ref scripts/docs/en/deps/macos.md "scripts/docs/en/deps/macos.md".
 At least MacOS 10.15 required with
 [Xcode](https://apps.apple.com/us/app/xcode/id497799835) and
 [Homebrew](https://brew.sh/).
@@ -220,7 +220,7 @@ At least MacOS 10.15 required with
 Dependencies could be installed via:
 
 ```bash
-brew install $(cat third_party/userver/scripts/docs/en/deps/macos.md | tr '\n' ' ')
+brew install $(cat scripts/docs/en/deps/macos.md | tr '\n' ' ')
 ```
 
 \b Recommended \b Makefile.local:
