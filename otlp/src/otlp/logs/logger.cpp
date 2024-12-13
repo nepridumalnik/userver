@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include <userver/engine/async.hpp>
+#include <userver/engine/get_all.hpp>
 #include <userver/formats/parse/common_containers.hpp>
 #include <userver/formats/parse/to.hpp>
 #include <userver/logging/impl/tag_writer.hpp>
@@ -236,12 +237,20 @@ void Logger::SendingLoop(Queue::Consumer& consumer, LogClient& log_client, Trace
             );
         } while (consumer.Pop(action, deadline));
 
+        std::vector<engine::TaskWithResult<void>> tasks;
+
         if (utils::UnderlyingValue(config_.logs_sink) & utils::UnderlyingValue(SinkType::kOtlp)) {
-            DoLog(log_request, log_client);
+            tasks.emplace_back(engine::CriticalAsyncNoSpan([this, &log_request, &log_client]() {
+                DoLog(log_request, log_client);
+            }));
         }
         if (utils::UnderlyingValue(config_.tracing_sink) & utils::UnderlyingValue(SinkType::kOtlp)) {
-            DoTrace(trace_request, trace_client);
+            tasks.emplace_back(engine::CriticalAsyncNoSpan([this, &trace_request, &trace_client]() {
+                DoTrace(trace_request, trace_client);
+            }));
         }
+
+        engine::GetAll(tasks);
     }
 }
 
