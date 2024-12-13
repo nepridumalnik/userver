@@ -28,6 +28,8 @@ SinkType Parse(const yaml_config::YamlConfig& value, formats::parse::To<SinkType
 
 struct LoggerConfig {
     size_t max_queue_size{10000};
+    size_t max_attempts = 1;
+    std::chrono::milliseconds attempt_delay{};
     std::chrono::milliseconds max_batch_delay{};
     SinkType logs_sink{SinkType::kOtlp};
     SinkType tracing_sink{SinkType::kOtlp};

@@ -5,6 +5,7 @@
 
 #include <userver/engine/async.hpp>
 #include <userver/engine/get_all.hpp>
+#include <userver/engine/sleep.hpp>
 #include <userver/formats/parse/common_containers.hpp>
 #include <userver/formats/parse/to.hpp>
 #include <userver/logging/impl/tag_writer.hpp>
@@ -22,11 +23,31 @@ USERVER_NAMESPACE_BEGIN
 namespace otlp {
 
 namespace {
+
 constexpr std::string_view kTelemetrySdkLanguage = "telemetry.sdk.language";
 constexpr std::string_view kTelemetrySdkName = "telemetry.sdk.name";
 constexpr std::string_view kServiceName = "service.name";
 
 const std::string kTimestampFormat = "%Y-%m-%dT%H:%M:%E*S";
+
+bool ResponseSuccess(const ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceResponse& response) {
+    if (!response.has_partial_success()) {
+        return true;
+    }
+
+    const auto& partial_success = response.partial_success();
+    return partial_success.rejected_spans() == 0 && partial_success.error_message().empty();
+}
+
+bool ResponseSuccess(const ::opentelemetry::proto::collector::logs::v1::ExportLogsServiceResponse& response) {
+    if (!response.has_partial_success()) {
+        return true;
+    }
+
+    const auto& partial_success = response.partial_success();
+    return partial_success.rejected_log_records() == 0 && partial_success.error_message().empty();
+}
+
 }  // namespace
 
 SinkType Parse(const yaml_config::YamlConfig& value, formats::parse::To<SinkType>) {
@@ -285,7 +306,17 @@ void Logger::DoLog(
     LogClient& client
 ) {
     try {
-        auto response = client.Export(request);
+        size_t attempt = 0;
+        do {
+            if (attempt) {
+                engine::SleepFor(config_.attempt_delay);
+            }
+
+            auto response = client.Export(request);
+            if (ResponseSuccess(response)) {
+                return;
+            }
+        } while (--attempt < config_.max_attempts);
     } catch (const ugrpc::client::RpcCancelledError&) {
         std::cerr << "Stopping OTLP sender task\n";
         throw;
@@ -300,7 +331,17 @@ void Logger::DoTrace(
     TraceClient& trace_client
 ) {
     try {
-        auto response = trace_client.Export(request);
+        size_t attempt = 0;
+        do {
+            if (attempt) {
+                engine::SleepFor(config_.attempt_delay);
+            }
+
+            auto response = trace_client.Export(request);
+            if (ResponseSuccess(response)) {
+                return;
+            }
+        } while (--attempt < config_.max_attempts);
     } catch (const ugrpc::client::RpcCancelledError&) {
         std::cerr << "Stopping OTLP sender task\n";
         throw;
