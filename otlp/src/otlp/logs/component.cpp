@@ -130,7 +130,7 @@ properties:
         description: max attempts to send logs and trace
     attempt-delay:
         type: string
-        description: max delay between attempts to send logs and trace (e.g. 100ms or 1s)
+        description: max delay between attempts send logs and trace (e.g. 100ms or 1s)
     max-batch-delay:
         type: string
         description: max delay between send batches (e.g. 100ms or 1s)
