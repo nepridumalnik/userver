@@ -93,8 +93,9 @@ void Logger::Log(logging::Level level, std::string_view msg) {
 
     ++stats_.by_level[static_cast<int>(level)];
 
-    [[maybe_unused]] auto parse_ok =
-        utils::encoding::TskvReadRecord(parser, [&](std::string_view key, std::string_view value) {
+    [[maybe_unused]] auto parse_ok = utils::encoding::TskvReadRecord(
+        parser,
+        [this, &log_record, &timestamp](std::string_view key, std::string_view value) {
             if (key == "text") {
                 log_record.mutable_body()->set_string_value(grpc::string(std::string{value}));
                 return true;
@@ -120,7 +121,8 @@ void Logger::Log(logging::Level level, std::string_view msg) {
             attributes->set_key(std::string{MapAttribute(key)});
             attributes->mutable_value()->set_string_value(std::string{value});
             return true;
-        });
+        }
+    );
 
     auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(timestamp.time_since_epoch());
     log_record.set_time_unix_nano(nanoseconds.count());
@@ -147,8 +149,9 @@ void Logger::Trace(logging::Level level, std::string_view msg) {
     std::string start_timestamp;
     std::string total_time;
 
-    [[maybe_unused]] auto parse_ok =
-        utils::encoding::TskvReadRecord(parser, [&](std::string_view key, std::string_view value) {
+    [[maybe_unused]] auto parse_ok = utils::encoding::TskvReadRecord(
+        parser,
+        [this, &span, &total_time, &start_timestamp](std::string_view key, std::string_view value) {
             if (key == "trace_id") {
                 span.set_trace_id(utils::encoding::FromHex(value));
                 return true;
@@ -181,7 +184,8 @@ void Logger::Trace(logging::Level level, std::string_view msg) {
             attributes->set_key(std::string{MapAttribute(key)});
             attributes->mutable_value()->set_string_value(std::string{value});
             return true;
-        });
+        }
+    );
 
     auto start_timestamp_double = std::stod(start_timestamp);
     span.set_start_time_unix_nano(start_timestamp_double * 1'000'000'000);
@@ -226,7 +230,8 @@ void Logger::SendingLoop(Queue::Consumer& consumer, LogClient& log_client, Trace
                     [&scope_logs](const opentelemetry::proto::logs::v1::LogRecord& action) {
                         auto log_records = scope_logs->add_log_records();
                         *log_records = action;
-                    }},
+                    }
+                },
                 action
             );
         } while (consumer.Pop(action, deadline));
