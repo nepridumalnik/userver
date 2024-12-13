@@ -258,7 +258,7 @@ void Logger::SendingLoop(Queue::Consumer& consumer, LogClient& log_client, Trace
             );
         } while (consumer.Pop(action, deadline));
 
-        std::vector<engine::TaskWithResult<void>> tasks;
+        std::vector<engine::TaskWithResult<void>> tasks(2);
 
         if (utils::UnderlyingValue(config_.logs_sink) & utils::UnderlyingValue(SinkType::kOtlp)) {
             tasks.emplace_back(engine::CriticalAsyncNoSpan([this, &log_request, &log_client]() {
@@ -316,7 +316,7 @@ void Logger::DoLog(
             if (ResponseSuccess(response)) {
                 return;
             }
-        } while (--attempt < config_.max_attempts);
+        } while (++attempt < config_.max_attempts);
     } catch (const ugrpc::client::RpcCancelledError&) {
         std::cerr << "Stopping OTLP sender task\n";
         throw;
@@ -341,7 +341,7 @@ void Logger::DoTrace(
             if (ResponseSuccess(response)) {
                 return;
             }
-        } while (--attempt < config_.max_attempts);
+        } while (++attempt < config_.max_attempts);
     } catch (const ugrpc::client::RpcCancelledError&) {
         std::cerr << "Stopping OTLP sender task\n";
         throw;
