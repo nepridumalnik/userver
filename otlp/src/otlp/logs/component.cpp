@@ -19,13 +19,6 @@
 
 #include <opentelemetry/proto/collector/logs/v1/logs_service_client.usrv.pb.hpp>
 
-namespace {
-
-// Attempts number can not be zero
-size_t ClampAttempts(size_t max_attempts) { return max_attempts == 0 ? 1 : max_attempts; }
-
-}  // namespace
-
 USERVER_NAMESPACE_BEGIN
 
 namespace otlp {
@@ -45,8 +38,9 @@ LoggerComponent::LoggerComponent(const components::ComponentConfig& config, cons
 
     LoggerConfig logger_config;
     logger_config.max_queue_size = config["max-queue-size"].As<size_t>(65535);
-    logger_config.max_attempts = ClampAttempts(config["max-attempts"].As<size_t>(1));
-    logger_config.attempt_delay = config["attempt-delay"].As<std::chrono::milliseconds>(100);
+    logger_config.max_attempts = config["max-attempts"].As<size_t>(3);
+    UASSERT_MSG(logger_config.max_attempts, "max-attempts should be greater than 0");
+    logger_config.attempt_delay = config["attempt-delay-ms"].As<std::chrono::milliseconds>(100);
     logger_config.max_batch_delay = config["max-batch-delay"].As<std::chrono::milliseconds>(100);
     logger_config.service_name = config["service-name"].As<std::string>("unknown_service");
     logger_config.log_level = config["log-level"].As<USERVER_NAMESPACE::logging::Level>();
@@ -128,7 +122,7 @@ properties:
     max-attempts:
         type: integer
         description: max attempts to send logs and trace
-    attempt-delay:
+    attempt-delay-ms:
         type: string
         description: max delay between send logs and trace (e.g. 100ms or 1s)
     max-batch-delay:

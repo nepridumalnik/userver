@@ -30,7 +30,7 @@ constexpr std::string_view kServiceName = "service.name";
 
 const std::string kTimestampFormat = "%Y-%m-%dT%H:%M:%E*S";
 
-bool ResponseSuccess(const ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceResponse& response) {
+bool IsResponseSuccess(const ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceResponse& response) {
     if (!response.has_partial_success()) {
         return true;
     }
@@ -39,7 +39,7 @@ bool ResponseSuccess(const ::opentelemetry::proto::collector::trace::v1::ExportT
     return partial_success.rejected_spans() == 0 && partial_success.error_message().empty();
 }
 
-bool ResponseSuccess(const ::opentelemetry::proto::collector::logs::v1::ExportLogsServiceResponse& response) {
+bool IsResponseSuccess(const ::opentelemetry::proto::collector::logs::v1::ExportLogsServiceResponse& response) {
     if (!response.has_partial_success()) {
         return true;
     }
@@ -309,11 +309,11 @@ void Logger::DoLog(
         size_t attempt = 0;
         do {
             if (attempt) {
-                engine::SleepFor(config_.attempt_delay);
+                engine::InterruptibleSleepFor(config_.attempt_delay);
             }
 
-            auto response = client.Export(request);
-            if (ResponseSuccess(response)) {
+            auto response = client.SyncExport(request);
+            if (IsResponseSuccess(response)) {
                 return;
             }
         } while (++attempt < config_.max_attempts);
@@ -334,11 +334,11 @@ void Logger::DoTrace(
         size_t attempt = 0;
         do {
             if (attempt) {
-                engine::SleepFor(config_.attempt_delay);
+                engine::InterruptibleSleepFor(config_.attempt_delay);
             }
 
-            auto response = trace_client.Export(request);
-            if (ResponseSuccess(response)) {
+            auto response = trace_client.SyncExport(request);
+            if (IsResponseSuccess(response)) {
                 return;
             }
         } while (++attempt < config_.max_attempts);
