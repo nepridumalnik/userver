@@ -10,6 +10,7 @@
 #include <userver/logging/impl/tag_writer.hpp>
 #include <userver/logging/logger.hpp>
 #include <userver/tracing/span.hpp>
+#include <userver/tracing/span_event.hpp>
 #include <userver/utils/assert.hpp>
 #include <userver/utils/encoding/hex.hpp>
 #include <userver/utils/encoding/tskv_parser_read.hpp>
