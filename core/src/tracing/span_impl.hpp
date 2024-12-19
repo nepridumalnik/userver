@@ -15,6 +15,7 @@
 #include <userver/logging/log_helper.hpp>
 #include <userver/tracing/scope_time.hpp>
 #include <userver/tracing/span.hpp>
+#include <userver/tracing/span_event_fwd.hpp>
 #include <userver/tracing/tracer.hpp>
 #include <userver/utils/impl/source_location.hpp>
 
