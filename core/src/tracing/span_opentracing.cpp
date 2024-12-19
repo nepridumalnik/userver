@@ -5,6 +5,7 @@
 #include <userver/formats/json/string_builder.hpp>
 #include <userver/logging/impl/tag_writer.hpp>
 #include <userver/logging/log_extra.hpp>
+#include <userver/tracing/span_event.hpp>
 #include <userver/tracing/tags.hpp>
 #include <userver/utils/trivial_map.hpp>
 
