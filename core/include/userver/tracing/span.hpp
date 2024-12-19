@@ -9,6 +9,7 @@
 #include <userver/logging/log.hpp>
 #include <userver/logging/log_extra.hpp>
 #include <userver/tracing/scope_time.hpp>
+#include <userver/tracing/span_event_fwd.hpp>
 #include <userver/tracing/tracer_fwd.hpp>
 #include <userver/utils/impl/internal_tag.hpp>
 #include <userver/utils/impl/source_location.hpp>
@@ -187,11 +188,11 @@ public:
     /// @overload AddNonInheritableTag
     void AddNonInheritableTags(const logging::LogExtra&);
 
-    /// Add an event to Span.
+    /// Add an event to Span
     void AddEvent(const std::string_view event_name);
 
-    /// Set span status.
-    void SetStatus(StatusCode status, const std::string_view description);
+    /// Add an event with attributes to Span
+    void AddEvent(const std::string_view event_name, std::initializer_list<SpanEventAttribute>&& attributes);
 
     /// @brief Sets level for tags logging
     void SetLogLevel(logging::Level log_level);
