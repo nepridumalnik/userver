@@ -9,6 +9,7 @@
 #include <userver/logging/impl/tag_writer.hpp>
 #include <userver/logging/logger.hpp>
 #include <userver/tracing/span.hpp>
+#include <userver/tracing/span_event.hpp>
 #include <userver/utils/assert.hpp>
 #include <userver/utils/encoding/hex.hpp>
 #include <userver/utils/encoding/tskv_parser_read.hpp>
@@ -21,11 +22,66 @@ USERVER_NAMESPACE_BEGIN
 namespace otlp {
 
 namespace {
+
 constexpr std::string_view kTelemetrySdkLanguage = "telemetry.sdk.language";
 constexpr std::string_view kTelemetrySdkName = "telemetry.sdk.name";
 constexpr std::string_view kServiceName = "service.name";
 
 const std::string kTimestampFormat = "%Y-%m-%dT%H:%M:%E*S";
+
+std::vector<tracing::SpanEvent> GetEventsFromValue(const std::string_view value) {
+    std::vector<tracing::SpanEvent> events;
+
+    return events;
+}
+
+void WriteEventsFromValue(::opentelemetry::proto::trace::v1::Span& span, const std::string_view value) {
+    std::vector<tracing::SpanEvent> events = GetEventsFromValue(value);
+
+    for (const auto& event : events) {
+        auto* event_proto = span.add_events();
+        event_proto->set_name(event.name);
+        event_proto->set_time_unix_nano(event.time_unix_nano);
+
+        for (const auto& attribute : event.attributes) {
+            auto* attribute_proto = event_proto->add_attributes();
+            attribute_proto->set_key(attribute.key);
+
+            std::visit(
+                [&attribute_proto](const auto& value) {
+                    using T = std::decay_t<decltype(value)>;
+                    if constexpr (std::is_same_v<T, std::string>) {
+                        attribute_proto->mutable_value()->set_string_value(value);
+                    } else if constexpr (std::is_same_v<T, bool>) {
+                        attribute_proto->mutable_value()->set_bool_value(value);
+                    } else if constexpr (std::is_same_v<T, int64_t>) {
+                        attribute_proto->mutable_value()->set_int_value(value);
+                    } else if constexpr (std::is_same_v<T, double>) {
+                        attribute_proto->mutable_value()->set_double_value(value);
+                    } else if constexpr (std::is_same_v<T, tracing::SpanEventAttribute::ArrayValue>) {
+                        for (const auto& array_value : value.values) {
+                            attribute_proto->mutable_value()->mutable_array_value()->add_values()->set_int_value(
+                                array_value
+                            );
+                        }
+                    } else if constexpr (std::is_same_v<T, tracing::SpanEventAttribute::KeyValueList>) {
+                        for (const auto& [key, val] : value.key_value_pairs) {
+                            auto* kv_entry = attribute_proto->mutable_value()->mutable_kvlist_value()->add_values();
+                            kv_entry->set_key(key);
+                            kv_entry->mutable_value()->set_string_value(val);
+                        }
+                    } else if constexpr (std::is_same_v<T, std::vector<uint8_t>>) {
+                        for (const auto& byte : value) {
+                            attribute_proto->mutable_value()->mutable_bytes_value()->push_back(byte);
+                        }
+                    }
+                },
+                attribute.value
+            );
+        }
+    }
+}
+
 }  // namespace
 
 SinkType Parse(const yaml_config::YamlConfig& value, formats::parse::To<SinkType>) {
@@ -93,8 +149,9 @@ void Logger::Log(logging::Level level, std::string_view msg) {
 
     ++stats_.by_level[static_cast<int>(level)];
 
-    [[maybe_unused]] auto parse_ok =
-        utils::encoding::TskvReadRecord(parser, [&](std::string_view key, std::string_view value) {
+    [[maybe_unused]] auto parse_ok = utils::encoding::TskvReadRecord(
+        parser,
+        [this, &log_record, &timestamp](std::string_view key, std::string_view value) {
             if (key == "text") {
                 log_record.mutable_body()->set_string_value(grpc::string(std::string{value}));
                 return true;
@@ -120,7 +177,8 @@ void Logger::Log(logging::Level level, std::string_view msg) {
             attributes->set_key(std::string{MapAttribute(key)});
             attributes->mutable_value()->set_string_value(std::string{value});
             return true;
-        });
+        }
+    );
 
     auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(timestamp.time_since_epoch());
     log_record.set_time_unix_nano(nanoseconds.count());
@@ -147,8 +205,9 @@ void Logger::Trace(logging::Level level, std::string_view msg) {
     std::string start_timestamp;
     std::string total_time;
 
-    [[maybe_unused]] auto parse_ok =
-        utils::encoding::TskvReadRecord(parser, [&](std::string_view key, std::string_view value) {
+    [[maybe_unused]] auto parse_ok = utils::encoding::TskvReadRecord(
+        parser,
+        [this, &span, &start_timestamp, &total_time](std::string_view key, std::string_view value) {
             if (key == "trace_id") {
                 span.set_trace_id(utils::encoding::FromHex(value));
                 return true;
@@ -176,12 +235,17 @@ void Logger::Trace(logging::Level level, std::string_view msg) {
             if (key == "timestamp" || key == "text") {
                 return true;
             }
+            if (key == "events") {
+                WriteEventsFromValue(span, value);
+                return true;
+            }
 
             auto attributes = span.add_attributes();
             attributes->set_key(std::string{MapAttribute(key)});
             attributes->mutable_value()->set_string_value(std::string{value});
             return true;
-        });
+        }
+    );
 
     auto start_timestamp_double = std::stod(start_timestamp);
     span.set_start_time_unix_nano(start_timestamp_double * 1'000'000'000);
@@ -226,7 +290,8 @@ void Logger::SendingLoop(Queue::Consumer& consumer, LogClient& log_client, Trace
                     [&scope_logs](const opentelemetry::proto::logs::v1::LogRecord& action) {
                         auto log_records = scope_logs->add_log_records();
                         *log_records = action;
-                    }},
+                    }
+                },
                 action
             );
         } while (consumer.Pop(action, deadline));
