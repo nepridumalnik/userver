@@ -9,6 +9,7 @@
 #include <userver/logging/impl/tag_writer.hpp>
 #include <userver/logging/logger.hpp>
 #include <userver/tracing/span.hpp>
+#include <userver/tracing/span_event.hpp>
 #include <userver/utils/assert.hpp>
 #include <userver/utils/encoding/hex.hpp>
 #include <userver/utils/overloaded.hpp>
@@ -20,11 +21,66 @@ USERVER_NAMESPACE_BEGIN
 namespace otlp {
 
 namespace {
+
 constexpr std::string_view kTelemetrySdkLanguage = "telemetry.sdk.language";
 constexpr std::string_view kTelemetrySdkName = "telemetry.sdk.name";
 constexpr std::string_view kServiceName = "service.name";
 
 const std::string kTimestampFormat = "%Y-%m-%dT%H:%M:%E*S";
+
+std::vector<tracing::SpanEvent> GetEventsFromValue(const std::string_view value) {
+    std::vector<tracing::SpanEvent> events;
+
+    return events;
+}
+
+void WriteEventsFromValue(::opentelemetry::proto::trace::v1::Span& span, const std::string_view value) {
+    std::vector<tracing::SpanEvent> events = GetEventsFromValue(value);
+
+    for (const auto& event : events) {
+        auto* event_proto = span.add_events();
+        event_proto->set_name(event.name);
+        event_proto->set_time_unix_nano(event.time_unix_nano);
+
+        for (const auto& attribute : event.attributes) {
+            auto* attribute_proto = event_proto->add_attributes();
+            attribute_proto->set_key(attribute.key);
+
+            std::visit(
+                [&attribute_proto](const auto& value) {
+                    using T = std::decay_t<decltype(value)>;
+                    if constexpr (std::is_same_v<T, std::string>) {
+                        attribute_proto->mutable_value()->set_string_value(value);
+                    } else if constexpr (std::is_same_v<T, bool>) {
+                        attribute_proto->mutable_value()->set_bool_value(value);
+                    } else if constexpr (std::is_same_v<T, int64_t>) {
+                        attribute_proto->mutable_value()->set_int_value(value);
+                    } else if constexpr (std::is_same_v<T, double>) {
+                        attribute_proto->mutable_value()->set_double_value(value);
+                    } else if constexpr (std::is_same_v<T, tracing::SpanEventAttribute::ArrayValue>) {
+                        for (const auto& array_value : value.values) {
+                            attribute_proto->mutable_value()->mutable_array_value()->add_values()->set_int_value(
+                                array_value
+                            );
+                        }
+                    } else if constexpr (std::is_same_v<T, tracing::SpanEventAttribute::KeyValueList>) {
+                        for (const auto& [key, val] : value.key_value_pairs) {
+                            auto* kv_entry = attribute_proto->mutable_value()->mutable_kvlist_value()->add_values();
+                            kv_entry->set_key(key);
+                            kv_entry->mutable_value()->set_string_value(val);
+                        }
+                    } else if constexpr (std::is_same_v<T, std::vector<uint8_t>>) {
+                        for (const auto& byte : value) {
+                            attribute_proto->mutable_value()->mutable_bytes_value()->push_back(byte);
+                        }
+                    }
+                },
+                attribute.value
+            );
+        }
+    }
+}
+
 }  // namespace
 
 Formatter::Formatter(
@@ -76,6 +132,8 @@ void Formatter::AddTag(std::string_view key, const logging::LogExtra::Value& val
                     span.set_start_time_unix_nano(item_.start_timestamp * 1'000'000'000);
                 } else if (key == "timestamp" || key == "text") {
                     // nothing
+                } else if (key == "events") {
+                    WriteEventsFromValue(span, value);
                 } else {
                     auto attributes = span.add_attributes();
                     attributes->set_key(std::string{logger_.MapAttribute(key)});
@@ -204,7 +262,8 @@ void Logger::SetAttributeValue(
             [&](long long x) { destination->set_int_value(x); },
             [&](unsigned long long x) { destination->set_int_value(x); },
             [&](double x) { destination->set_double_value(x); },
-            [&](const std::string& x) { destination->set_string_value(x); }},
+            [&](const std::string& x) { destination->set_string_value(x); }
+        },
         value
     );
 }
@@ -241,7 +300,8 @@ void Logger::SendingLoop(Queue::Consumer& consumer, LogClient& log_client, Trace
                     [&scope_logs](const opentelemetry::proto::logs::v1::LogRecord& action) {
                         auto log_records = scope_logs->add_log_records();
                         *log_records = action;
-                    }},
+                    }
+                },
                 action
             );
         } while (consumer.Pop(action, deadline));
