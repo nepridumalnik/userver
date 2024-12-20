@@ -10,7 +10,6 @@
 #include <userver/logging/impl/tag_writer.hpp>
 #include <userver/logging/logger.hpp>
 #include <userver/tracing/span.hpp>
-#include <userver/tracing/span_event.hpp>
 #include <userver/utils/assert.hpp>
 #include <userver/utils/encoding/hex.hpp>
 #include <userver/utils/encoding/tskv_parser_read.hpp>
@@ -29,8 +28,8 @@ constexpr std::string_view kServiceName = "service.name";
 
 const std::string kTimestampFormat = "%Y-%m-%dT%H:%M:%E*S";
 
-std::vector<tracing::SpanEvent> GetEventsFromValue(const std::string_view value) {
-    std::vector<tracing::SpanEvent> events;
+std::vector<tracing::Span::Event> GetEventsFromValue(const std::string_view value) {
+    std::vector<tracing::Span::Event> events;
 
     auto json_value = formats::json::FromString(value);
 
@@ -42,7 +41,7 @@ std::vector<tracing::SpanEvent> GetEventsFromValue(const std::string_view value)
 
     for (size_t i = 0; i < size; ++i) {
         const auto& json_event = json_value[i];
-        tracing::SpanEvent event;
+        tracing::Span::Event event;
 
         if (json_event.HasMember("name") && json_event["name"].IsString()) {
             event.name = json_event["name"].As<std::string>();
@@ -63,49 +62,12 @@ std::vector<tracing::SpanEvent> GetEventsFromValue(const std::string_view value)
 }
 
 void WriteEventsFromValue(::opentelemetry::proto::trace::v1::Span& span, const std::string_view value) {
-    std::vector<tracing::SpanEvent> events = GetEventsFromValue(value);
+    std::vector<tracing::Span::Event> events = GetEventsFromValue(value);
 
     for (const auto& event : events) {
         auto* event_proto = span.add_events();
         event_proto->set_name(event.name);
         event_proto->set_time_unix_nano(event.time_unix_nano);
-
-        for (const auto& attribute : event.attributes) {
-            auto* attribute_proto = event_proto->add_attributes();
-            attribute_proto->set_key(attribute.key);
-
-            std::visit(
-                [&attribute_proto](const auto& value) {
-                    using T = std::decay_t<decltype(value)>;
-                    if constexpr (std::is_same_v<T, std::string>) {
-                        attribute_proto->mutable_value()->set_string_value(value);
-                    } else if constexpr (std::is_same_v<T, bool>) {
-                        attribute_proto->mutable_value()->set_bool_value(value);
-                    } else if constexpr (std::is_same_v<T, int64_t>) {
-                        attribute_proto->mutable_value()->set_int_value(value);
-                    } else if constexpr (std::is_same_v<T, double>) {
-                        attribute_proto->mutable_value()->set_double_value(value);
-                    } else if constexpr (std::is_same_v<T, tracing::SpanEventAttribute::ArrayValue>) {
-                        for (const auto& array_value : value.values) {
-                            attribute_proto->mutable_value()->mutable_array_value()->add_values()->set_int_value(
-                                array_value
-                            );
-                        }
-                    } else if constexpr (std::is_same_v<T, tracing::SpanEventAttribute::KeyValueList>) {
-                        for (const auto& [key, val] : value.key_value_pairs) {
-                            auto* kv_entry = attribute_proto->mutable_value()->mutable_kvlist_value()->add_values();
-                            kv_entry->set_key(key);
-                            kv_entry->mutable_value()->set_string_value(val);
-                        }
-                    } else if constexpr (std::is_same_v<T, std::vector<uint8_t>>) {
-                        for (const auto& byte : value) {
-                            attribute_proto->mutable_value()->mutable_bytes_value()->push_back(byte);
-                        }
-                    }
-                },
-                attribute.value
-            );
-        }
     }
 }
 
