@@ -355,12 +355,9 @@ void Logger::DoTrace(
 }
 
 std::string_view Logger::MapAttribute(std::string_view attr) const {
-    const auto it = config_.attributes_mapping.find(std::string{attr});
-
-    if (it != config_.attributes_mapping.end()) {
-        return it->second;
+    for (const auto& [key, value] : config_.attributes_mapping) {
+        if (key == attr) return value;
     }
-
     return attr;
 }
 
