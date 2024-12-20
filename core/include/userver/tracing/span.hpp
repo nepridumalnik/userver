@@ -47,8 +47,10 @@ public:
         /// @param time_unix_nano Event timestamp.
         Event(
             const std::string_view name,
-            double time_unix_nano =
-                std::chrono::nanoseconds(std::chrono::system_clock::now().time_since_epoch()).count()
+            double time_unix_nano = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                        std::chrono::system_clock::now().time_since_epoch()
+            )
+                                        .count()
         );
 
         /// @brief Default constructor.
