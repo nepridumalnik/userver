@@ -34,6 +34,8 @@ struct SpanEvent {
           name{name},
           attributes{std::move(attributes)} {}
 
+    SpanEvent() = default;
+
     double time_unix_nano;
     std::string name;
     std::vector<SpanEventAttribute> attributes;
