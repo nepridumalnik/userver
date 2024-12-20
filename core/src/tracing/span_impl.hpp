@@ -77,6 +77,7 @@ public:
     void AttachToCoroStack();
 
 private:
+    void LogEvents(logging::impl::TagWriter& writer) const;
     void LogOpenTracing() const;
     void DoLogOpenTracing(logging::impl::TagWriter writer) const;
     static void AddOpentracingTags(formats::json::StringBuilder& output, const logging::LogExtra& input);
