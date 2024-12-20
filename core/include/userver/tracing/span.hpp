@@ -9,7 +9,6 @@
 #include <userver/logging/log.hpp>
 #include <userver/logging/log_extra.hpp>
 #include <userver/tracing/scope_time.hpp>
-#include <userver/tracing/span_event_fwd.hpp>
 #include <userver/tracing/tracer_fwd.hpp>
 #include <userver/utils/impl/internal_tag.hpp>
 #include <userver/utils/impl/source_location.hpp>
@@ -34,33 +33,15 @@ class Span final {
 public:
     class Impl;
 
-    /// @brief Operation status code.
-    enum class StatusCode : uint8_t {
-        kUnset,  // Default status.
-        kOk,     // Operation has completed successfully.
-        kError,  // The operation contains an error.
-    };
-
-    /// @brief Create span event
-    struct Event final {
-        /// @brief Constructor.
-        /// @param name Event name.
-        /// @param time_unix_nano Event timestamp.
+    struct Event {
         Event(
-            std::string_view name,
-            double time_unix_nano = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                                        std::chrono::system_clock::now().time_since_epoch()
-            )
-                                        .count()
+            const std::string_view name,
+            double time_unix_nano = std::chrono::system_clock::now().time_since_epoch().count()
         );
 
-        /// @brief Default constructor.
         Event() = default;
 
-        /// @brief Event timestamp.
         double time_unix_nano{};
-
-        /// @brief Event name.
         std::string name;
     };
 
@@ -190,9 +171,6 @@ public:
 
     /// Add an event to Span
     void AddEvent(const std::string_view event_name);
-
-    /// Add an event with attributes to Span
-    void AddEvent(const std::string_view event_name, std::initializer_list<SpanEventAttribute>&& attributes);
 
     /// @brief Sets level for tags logging
     void SetLogLevel(logging::Level log_level);

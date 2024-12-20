@@ -11,7 +11,6 @@
 #include <userver/logging/impl/logger_base.hpp>
 #include <userver/logging/impl/tag_writer.hpp>
 #include <userver/tracing/span.hpp>
-#include <userver/tracing/span_event.hpp>
 #include <userver/tracing/tags.hpp>
 #include <userver/tracing/tracer.hpp>
 #include <userver/utils/assert.hpp>
@@ -372,10 +371,6 @@ void Span::AddTagFrozen(std::string key, logging::LogExtra::Value value) {
 
 void Span::AddEvent(const std::string_view event_name) { pimpl_->events_.emplace_back(event_name); }
 
-void Span::AddEvent(const std::string_view event_name, std::initializer_list<SpanEventAttribute>&& attributes) {
-    pimpl_->events_.emplace_back(event_name, std::move(attributes));
-}
-
 void Span::SetLink(std::string link) { AddTagFrozen(kLinkTag, std::move(link)); }
 
 void Span::SetParentLink(std::string parent_link) { AddTagFrozen(kParentLinkTag, std::move(parent_link)); }
@@ -424,6 +419,7 @@ Span::Event::Event(std::string_view name, double time_unix_nano) : time_unix_nan
 
 namespace impl {
 
+namespace impl {
 struct DetachLocalSpansScope::Impl {
     SpanStack old_spans;
 };
