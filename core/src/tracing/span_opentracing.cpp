@@ -132,16 +132,12 @@ void Span::Impl::LogEvents(logging::impl::TagWriter& writer) const {
     }
 
     formats::json::StringBuilder events;
+
     {
-        const formats::json::StringBuilder::ArrayGuard guard(events);
+        const formats::json::StringBuilder::ObjectGuard event_guard(events);
 
         for (const auto& event : events_) {
-            const formats::json::StringBuilder::ObjectGuard event_guard(events);
-
-            events.Key("name");
-            events.WriteString(event.name);
-
-            events.Key("time_unix_nano");
+            events.Key(event.name);
             events.WriteDouble(event.time_unix_nano);
         }
     }
