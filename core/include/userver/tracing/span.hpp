@@ -189,7 +189,7 @@ public:
     void AddEvent(const std::string_view event_name);
 
     /// Set span status.
-    void SetStatus(StatusCode status, const std::string_view description = "");
+    void SetStatus(StatusCode status, const std::string_view description);
 
     /// @brief Sets level for tags logging
     void SetLogLevel(logging::Level log_level);
