@@ -15,7 +15,6 @@
 #include <userver/logging/log_helper.hpp>
 #include <userver/tracing/scope_time.hpp>
 #include <userver/tracing/span.hpp>
-#include <userver/tracing/span_event_fwd.hpp>
 #include <userver/tracing/tracer.hpp>
 #include <userver/utils/impl/source_location.hpp>
 
@@ -107,7 +106,7 @@ private:
     const ReferenceType reference_type_;
     utils::impl::SourceLocation source_location_;
 
-    std::vector<SpanEvent> events_;
+    std::vector<Span::Event> events_;
 
     friend class Span;
     friend class SpanBuilder;

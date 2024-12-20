@@ -9,7 +9,6 @@
 #include <userver/logging/log.hpp>
 #include <userver/logging/log_extra.hpp>
 #include <userver/tracing/scope_time.hpp>
-#include <userver/tracing/span_event_fwd.hpp>
 #include <userver/tracing/tracer_fwd.hpp>
 #include <userver/utils/impl/internal_tag.hpp>
 #include <userver/utils/impl/source_location.hpp>
@@ -33,6 +32,18 @@ class SpanBuilder;
 class Span final {
 public:
     class Impl;
+
+    struct Event {
+        Event(
+            const std::string_view name,
+            double time_unix_nano = std::chrono::system_clock::now().time_since_epoch().count()
+        );
+
+        Event() = default;
+
+        double time_unix_nano{};
+        std::string name;
+    };
 
     explicit Span(
         TracerPtr tracer,
@@ -160,9 +171,6 @@ public:
 
     /// Add an event to Span
     void AddEvent(const std::string_view event_name);
-
-    /// Add an event with attributes to Span
-    void AddEvent(const std::string_view event_name, std::initializer_list<SpanEventAttribute>&& attributes);
 
     /// @brief Sets level for tags logging
     void SetLogLevel(logging::Level log_level);
