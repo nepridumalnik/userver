@@ -33,31 +33,24 @@ class Span final {
 public:
     class Impl;
 
-    /// @brief Operation status code.
-    enum class StatusCode : uint8_t {
-        kUnset,  // Default status.
-        kOk,     // Operation has completed successfully.
-        kError,  // The operation contains an error.
-    };
-
     /// @brief Create span event
     struct Event final {
-        /// @brief Constructor.
-        /// @param name Event name.
-        /// @param time_unix_nano Event timestamp.
+        /// @brief Constructor
+        /// @param name Event name
+        /// @param time_unix_nano Event timestamp
         Event(
             const std::string_view name,
             double time_unix_nano =
                 std::chrono::nanoseconds(std::chrono::system_clock::now().time_since_epoch()).count()
         );
 
-        /// @brief Default constructor.
+        /// @brief Default constructor
         Event() = default;
 
-        /// @brief Event timestamp.
+        /// @brief Event timestamp
         double time_unix_nano{};
 
-        /// @brief Event name.
+        /// @brief Event name
         std::string name;
     };
 
