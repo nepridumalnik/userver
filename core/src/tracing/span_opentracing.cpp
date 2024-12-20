@@ -134,6 +134,12 @@ void Span::Impl::LogEvents(logging::impl::TagWriter& writer) const {
 
     formats::json::StringBuilder events;
 
+void Span::Impl::LogEvents(logging::impl::TagWriter& writer) const {
+    if (events_.empty()) {
+        return;
+    }
+
+    formats::json::StringBuilder events;
     {
         const formats::json::StringBuilder::ObjectGuard event_guard(events);
 
