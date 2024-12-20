@@ -85,6 +85,7 @@ void WriteEventAttributes(
     const std::vector<tracing::SpanEventAttribute>& attributes,
     formats::json::StringBuilder& attributes_builder
 ) {
+    // FIXME: Repair thrown
     const formats::json::StringBuilder::ArrayGuard attributes_guard(attributes_builder);
 
     for (const auto& attribute : attributes) {
@@ -182,27 +183,31 @@ void Span::Impl::DoLogOpenTracing(logging::impl::TagWriter writer) const {
         }
         writer.PutTag("tags", tags.GetStringView());
     }
+}
 
+void Span::Impl::LogEvents(logging::impl::TagWriter& writer) const {
+    if (events_.empty()) {
+        return;
+    }
+
+    formats::json::StringBuilder events;
     {
-        formats::json::StringBuilder events;
         const formats::json::StringBuilder::ArrayGuard guard(events);
 
-        // TODO: Implement events serialization
         for (const auto& event : events_) {
-            formats::json::StringBuilder event_object;
-            const formats::json::StringBuilder::ObjectGuard event_guard(event_object);
+            const formats::json::StringBuilder::ObjectGuard event_guard(events);
 
-            event_object.Key("name");
-            event_object.WriteString(event.name);
+            events.Key("name");
+            events.WriteString(event.name);
 
-            event_object.Key("time_unix_nano");
-            event_object.WriteDouble(event.time_unix_nano);
+            events.Key("time_unix_nano");
+            events.WriteDouble(event.time_unix_nano);
 
-            WriteEventAttributes(event.attributes, event_object);
+            // WriteEventAttributes(event.attributes, events);
         }
-
-        writer.PutTag("events", events.GetStringView());
     }
+
+    writer.PutTag("events", events.GetStringView());
 }
 
 void Span::Impl::AddOpentracingTags(formats::json::StringBuilder& output, const logging::LogExtra& input) {

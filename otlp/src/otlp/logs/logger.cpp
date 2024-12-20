@@ -32,6 +32,33 @@ const std::string kTimestampFormat = "%Y-%m-%dT%H:%M:%E*S";
 std::vector<tracing::SpanEvent> GetEventsFromValue(const std::string_view value) {
     std::vector<tracing::SpanEvent> events;
 
+    auto json_value = formats::json::FromString(value);
+
+    if (!json_value.IsArray()) {
+        throw std::runtime_error("Expected JSON array in 'value'");
+    }
+
+    const size_t size = json_value.GetSize();
+
+    for (size_t i = 0; i < size; ++i) {
+        const auto& json_event = json_value[i];
+        tracing::SpanEvent event;
+
+        if (json_event.HasMember("name") && json_event["name"].IsString()) {
+            event.name = json_event["name"].As<std::string>();
+        } else {
+            throw std::runtime_error("Missing or invalid 'name' field in event");
+        }
+
+        if (json_event.HasMember("time_unix_nano") && json_event["time_unix_nano"].IsDouble()) {
+            event.time_unix_nano = json_event["time_unix_nano"].As<double>();
+        } else {
+            throw std::runtime_error("Missing or invalid 'time_unix_nano' field in event");
+        }
+
+        events.push_back(std::move(event));
+    }
+
     return events;
 }
 
