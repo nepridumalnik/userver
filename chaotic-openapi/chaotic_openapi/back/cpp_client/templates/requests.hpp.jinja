@@ -1,11 +1,15 @@
 #pragma once
 
 #include <string>
-{# TODO: variant #}
+{% if spec.has_multiple_content_type_request() %}
+#include <variant>
+{% endif %}
 
 #include <userver/clients/http/request.hpp>
+{% for include in spec.requests_declaration_includes() %}
+#include <{{ include }}>
+{% endfor %}
 
-{# TODO: request_bodies includes #}
 
 namespace {{ namespace }} {
 
@@ -16,9 +20,14 @@ namespace {{ namespace }} {
       {% if len(op.request_bodies) == 1 %}
         using Body = {{ op.request_bodies[0].schema.cpp_user_name() }};
       {% elif len(op.request_bodies) > 1 %}
+        {%- for body in op.request_bodies -%}
+          struct {{ op.request_bodies[0].cpp_body_type() }} {
+            std::string data;
+          };
+        {% endfor %}
         using Body = std::variant<
           {%- for body in op.request_bodies -%}
-            {{ op.request_bodies[0].schema.cpp_user_name() }}
+            {{ op.request_bodies[0].cpp_body_type() }}
             {%- if not loop.last %},{% endif %}
           {% endfor %}
         >

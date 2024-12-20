@@ -46,6 +46,8 @@ CommandControl Parse(const formats::json::Value& elem, formats::parse::To<Comman
             }
         } else if (name == "allow_reads_from_master") {
             result.allow_reads_from_master = option.As<bool>();
+        } else if (name == "force_request_to_master") {
+            result.force_request_to_master = option.As<bool>();
         } else {
             LOG_WARNING() << "unknown key for CommandControl map: " << name;
         }

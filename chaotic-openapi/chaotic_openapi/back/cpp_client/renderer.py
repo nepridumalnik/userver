@@ -76,6 +76,7 @@ JINJA_ENV = make_env()
 
 def render(spec: types.ClientSpec, context: Context) -> List[CppOutput]:
     env = {
+        'spec': spec,
         'namespace': spec.cpp_namespace,
         'name': spec.client_name,
         'base_url': 'http://example.com',  # TODO
