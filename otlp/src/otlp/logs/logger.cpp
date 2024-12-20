@@ -10,7 +10,6 @@
 #include <userver/logging/impl/tag_writer.hpp>
 #include <userver/logging/logger.hpp>
 #include <userver/tracing/span.hpp>
-#include <userver/tracing/span_event.hpp>
 #include <userver/utils/assert.hpp>
 #include <userver/utils/encoding/hex.hpp>
 #include <userver/utils/encoding/tskv_parser_read.hpp>
@@ -53,7 +52,7 @@ std::vector<tracing::Span::Event> GetEventsFromValue(const std::string_view valu
 
     for (size_t i = 0; i < size; ++i) {
         const auto& json_event = json_value[i];
-        tracing::SpanEvent event;
+        tracing::Span::Event event;
 
         if (json_event.HasMember("name") && json_event["name"].IsString()) {
             event.name = json_event["name"].As<std::string>();

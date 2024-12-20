@@ -11,7 +11,6 @@
 #include <userver/logging/impl/logger_base.hpp>
 #include <userver/logging/impl/tag_writer.hpp>
 #include <userver/tracing/span.hpp>
-#include <userver/tracing/span_event.hpp>
 #include <userver/tracing/tags.hpp>
 #include <userver/tracing/tracer.hpp>
 #include <userver/utils/assert.hpp>

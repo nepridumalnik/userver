@@ -9,7 +9,6 @@
 #include <userver/logging/log.hpp>
 #include <userver/logging/log_extra.hpp>
 #include <userver/tracing/scope_time.hpp>
-#include <userver/tracing/span_event_fwd.hpp>
 #include <userver/tracing/tracer_fwd.hpp>
 #include <userver/utils/impl/internal_tag.hpp>
 #include <userver/utils/impl/source_location.hpp>
