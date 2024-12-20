@@ -36,7 +36,8 @@ public:
     struct Event {
         Event(
             const std::string_view name,
-            double time_unix_nano = std::chrono::system_clock::now().time_since_epoch().count()
+            double time_unix_nano =
+                std::chrono::nanoseconds(std::chrono::system_clock::now().time_since_epoch()).count()
         );
 
         Event() = default;
