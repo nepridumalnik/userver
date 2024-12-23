@@ -436,6 +436,7 @@ const Span::Impl* GetParentSpanImpl() {
 Span::Event::Event(const std::string_view name, double time_unix_nano) : time_unix_nano{time_unix_nano}, name{name} {}
 
 namespace impl {
+
 struct DetachLocalSpansScope::Impl {
     SpanStack old_spans;
 };
