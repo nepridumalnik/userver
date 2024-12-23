@@ -438,6 +438,7 @@ Span::Event::Event(std::string_view name, double time_unix_nano) : time_unix_nan
 namespace impl {
 
 namespace impl {
+
 struct DetachLocalSpansScope::Impl {
     SpanStack old_spans;
 };
