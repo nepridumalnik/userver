@@ -46,7 +46,7 @@ public:
         /// @param name Event name.
         /// @param time_unix_nano Event timestamp.
         Event(
-            const std::string_view name,
+            std::string_view name,
             double time_unix_nano = std::chrono::duration_cast<std::chrono::nanoseconds>(
                                         std::chrono::system_clock::now().time_since_epoch()
             )

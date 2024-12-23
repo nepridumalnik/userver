@@ -32,7 +32,7 @@ const std::string kTimestampFormat = "%Y-%m-%dT%H:%M:%E*S";
 std::vector<tracing::Span::Event> GetEventsFromValue(const std::string_view value) {
     std::vector<tracing::Span::Event> events;
 
-    auto json_value = formats::json::FromString(value);
+    const auto json_value = formats::json::FromString(value);
 
     if (!json_value.IsObject()) {
         throw std::runtime_error("Expected JSON object in \"value\"");

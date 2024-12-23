@@ -433,7 +433,7 @@ const Span::Impl* GetParentSpanImpl() {
     return !spans_ptr || spans_ptr->empty() ? nullptr : &spans_ptr->back();
 }
 
-Span::Event::Event(const std::string_view name, double time_unix_nano) : time_unix_nano{time_unix_nano}, name{name} {}
+Span::Event::Event(std::string_view name, double time_unix_nano) : time_unix_nano{time_unix_nano}, name{name} {}
 
 namespace impl {
 
