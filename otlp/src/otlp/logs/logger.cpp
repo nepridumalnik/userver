@@ -42,16 +42,6 @@ std::vector<tracing::Span::Event> GetEventsFromValue(const std::string_view valu
         events.emplace_back(key, value.As<double>());
     }
 
-    auto json_value = formats::json::FromString(value);
-
-    if (!json_value.IsArray()) {
-        throw std::runtime_error("Expected JSON array in 'value'");
-    }
-
-    for (const auto& [key, value] : formats::common::Items(json_value)) {
-        events.emplace_back(key, value.As<double>());
-    }
-
     return events;
 }
 
