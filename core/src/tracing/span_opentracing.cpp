@@ -135,7 +135,7 @@ void Span::Impl::LogEvents(logging::impl::TagWriter& writer) const {
 
         for (const auto& event : events_) {
             events.Key(event.name);
-            events.WriteDouble(event.time_unix_nano);
+            events.WriteUInt64(event.time_unix_nano);
         }
     }
 
