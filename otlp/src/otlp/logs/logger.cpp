@@ -312,7 +312,7 @@ void Logger::DoLog(
                 engine::InterruptibleSleepFor(config_.attempt_delay);
             }
 
-            auto response = client.SyncExport(request);
+            auto response = client.Export(request);
             if (IsResponseSuccess(response)) {
                 return;
             }
@@ -337,7 +337,7 @@ void Logger::DoTrace(
                 engine::InterruptibleSleepFor(config_.attempt_delay);
             }
 
-            auto response = trace_client.SyncExport(request);
+            auto response = trace_client.Export(request);
             if (IsResponseSuccess(response)) {
                 return;
             }
