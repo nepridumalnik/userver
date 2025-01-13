@@ -2,6 +2,7 @@
 
 @note In case you struggle with setting up userver dependencies there are other options:
 
+* Prebuilt `.deb` package in each release of userver framework
 * @ref docker_with_ubuntu_22_04 "Docker"
 * @ref userver_conan "Conan"
 

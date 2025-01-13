@@ -1376,6 +1376,12 @@ void WriteToStream(const Decimal<Prec, RoundPolicy>& object, StringBuilder& sw) 
     WriteToStream(ToString(object), sw);
 }
 
+/// gtest formatter for decimal64::Decimal
+template <int Prec, typename RoundPolicy>
+void PrintTo(const Decimal<Prec, RoundPolicy>& v, std::ostream* os) {
+    *os << v;
+}
+
 }  // namespace decimal64
 
 USERVER_NAMESPACE_END

@@ -139,6 +139,11 @@ void PutArg(CmdArgs::CmdArgsArray& args_, const ZaddOptions& arg) {
     else if (arg.exist == ZaddOptions::Exist::kAddIfExist)
         args_.emplace_back("XX");
 
+    if (arg.compare == ZaddOptions::Compare::kGreaterThan)
+        args_.emplace_back("GT");
+    else if (arg.compare == ZaddOptions::Compare::kLessThan)
+        args_.emplace_back("LT");
+
     if (arg.return_value == ZaddOptions::ReturnValue::kChangedCount) args_.emplace_back("CH");
 }
 

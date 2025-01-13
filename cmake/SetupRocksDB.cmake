@@ -4,9 +4,9 @@ option(USERVER_DOWNLOAD_PACKAGE_ROCKS "Download and setup RocksDB if no RocksDB 
 
 if(NOT USERVER_FORCE_DOWNLOAD_PACKAGES)
   if(USERVER_DOWNLOAD_PACKAGE_ROCKS)
-    find_package(RocksDB QUIET)
+    find_package(RocksDB QUIET CONFIG)
   else()
-    find_package(RocksDB REQUIRED)
+    find_package(RocksDB REQUIRED CONFIG)
   endif()
 
   if(RocksDB_FOUND)
@@ -16,8 +16,8 @@ endif()
 
 find_package(libgflags REQUIRED)
 find_package(libsnappy REQUIRED)
-find_package(libz REQUIRED)
-find_package(libzip REQUIRED)
+find_package(ZLIB REQUIRED)
+find_package(BZip2 REQUIRED)
 find_package(libzstd REQUIRED)
 
 include(DownloadUsingCPM)
@@ -28,11 +28,17 @@ CPMAddPackage(
   GIT_TAG v9.7.4
   OPTIONS
   "ROCKSDB_BUILD_SHARED OFF"
+  "WITH_SNAPPY ON"
+  "WITH_BZ2 ON"
+  "WITH_ZSTD ON"
   "WITH_TESTS OFF"
   "WITH_BENCHMARK_TOOLS OFF"
   "WITH_TOOLS OFF"
+  "WITH_CORE_TOOLS OFF"
+  "WITH_TRACE_TOOLS OFF"
   "USE_RTTI ON"
+  "GFLAGS_SHARED FALSE"
 )
 
 mark_targets_as_system("${rocksdb_SOURCE_DIR}")
-write_package_stub(rocksdb)
+add_library(RocksDB::rocksdb ALIAS rocksdb)

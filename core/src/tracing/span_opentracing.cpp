@@ -130,7 +130,6 @@ void Span::Impl::LogEvents(logging::impl::TagWriter& writer) const {
     }
 
     formats::json::StringBuilder events;
-
     {
         const formats::json::StringBuilder::ObjectGuard event_guard(events);
 

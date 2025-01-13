@@ -3,9 +3,6 @@ cmake_policy(SET CMP0025 NEW)
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
   cmake_policy(SET CMP0093 NEW)
 endif()
-if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.31")
-  cmake_policy(SET CMP0171 NEW)
-endif()
 set(CMAKE_POLICY_DEFAULT_CMP0028 NEW)
 set(CMAKE_POLICY_DEFAULT_CMP0048 NEW)
 set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
@@ -21,6 +18,9 @@ option(
     "Prepare build of userver to install in system"
     OFF
 )
+if(CMAKE_VERSION GREATER_EQUAL 3.31)
+  cmake_policy(SET CMP0177 NEW)
+endif()
 
 set(USERVER_AVAILABLE_COMPONENTS universal)
 
@@ -147,6 +147,16 @@ option(USERVER_FEATURE_OTLP "Provide asynchronous OTLP exporters" "${USERVER_LIB
 set(CMAKE_DEBUG_POSTFIX d)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
+option(USERVER_USE_STATIC_LIBS "Tries to find all dependencies as static libraries" OFF)
+
+if(USERVER_USE_STATIC_LIBS)
+  message(
+    WARNING
+    "USERVER_USE_STATIC_LIBS turned ON, prioritized to find static libraries. Not all dependencies may be taken into account and linkage may be broken")
+  include(UserverPreferStaticLibs)
+endif()
+
 include(UserverSetupEnvironment)
 userver_setup_environment()
 
@@ -208,7 +218,7 @@ endif()
 if (USERVER_FEATURE_POSTGRESQL)
   _require_userver_core("USERVER_FEATURE_POSTGRESQL")
   add_subdirectory(postgresql)
-  list(APPEND USERVER_AVAILABLE_COMPONENTS postgres)
+  list(APPEND USERVER_AVAILABLE_COMPONENTS postgresql)
 endif()
 
 if (USERVER_FEATURE_REDIS)

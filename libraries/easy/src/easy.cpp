@@ -4,8 +4,12 @@
 #include <iostream>
 #include <unordered_map>
 
+#include <fmt/ranges.h>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/program_options.hpp>
+
+#include <fmt/format.h>
+#include <fmt/ranges.h>
 
 #include <userver/clients/dns/component.hpp>
 #include <userver/clients/http/component.hpp>

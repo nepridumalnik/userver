@@ -76,6 +76,8 @@ Changelog news also go to the
   for the PR!
 * Added unbounded queue variants concurrent::UnboundedNonFifoMpscQueue, concurrent::UnboundedSpmcQueue,
   and concurrent::UnboundedSpscQueue. Those queues are usually x2 faster than the bounded variants.
+* `GT` and `LT` flags support in Redis `ZADD`. Thanks to [Nikolay Pervushin](https://github.com/Greenvi4) for the PR!
+* Reduced condition in OTLP, thanks to [Dudnik Pavel](https://github.com/nepridumalnik).
 
 * Build:
   * Simplified Profile Guided Optimization (PGO) gathering and usage due to new `USERVER_PGO_GENERATE` and
@@ -85,6 +87,9 @@ Changelog news also go to the
     See @ref scripts/docs/en/userver/build/options.md for more info.
   * Source directory now can contain spaces.
   * Correctly set grpc-reflection found flag. Thanks to [Nikita](https://github.com/rtkid-nik) for the PR!
+  * Fixed `USERVER_CHAOTIC_FORMAT` option for CMake build. Thanks to [Konstantin Goncharik](https://github.com/botanegg)
+    for the PR.
+  * Optimized reconfiguration in CMake giving up to 60% time save (6-20 seconds).
 
 * Documentation and diagnostics:
   * More information on Mongo heartbeat in logs.
@@ -93,6 +98,7 @@ Changelog news also go to the
   * Better samples and docs for utils::statistics::Writer.
   * Added direct database access to testsuite samples.
   * Updated the @ref concurrent_queues "Concurrent Queues" docs.
+  * Log formats message was amended. Thanks to [tkhanipov](https://github.com/tkhanipov) for the PR!
 
 
 ### Release v2.5

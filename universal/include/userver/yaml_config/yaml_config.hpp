@@ -94,9 +94,6 @@ public:
     /// YamlConfig = config + config_vars
     YamlConfig(formats::yaml::Value yaml, formats::yaml::Value config_vars, Mode mode = Mode::kSecure);
 
-    /// Get the plain Yaml without substitutions. It may contain raw references.
-    const formats::yaml::Value& Yaml() const;
-
     /// @brief Access member by key for read.
     /// @throw TypeMismatchException if value is not missing and is not object.
     YamlConfig operator[](std::string_view key) const;
@@ -195,6 +192,11 @@ public:
     /// @throw TypeMismatchException is the value of *this is not a map, array
     /// or Null.
     const_iterator end() const;
+
+    /// @brief Get the plain Yaml without substitutions. It may contain raw references.
+    /// @deprecated Either use the current `YamlConfig` as a formats value, or use `.As<formats::json::Value>()`
+    /// to get the correct treatment for `$vars`, `#fallback`, `#env` and `#file`.
+    formats::yaml::Value GetRawYamlWithoutConfigVars() const;
 
 private:
     formats::yaml::Value yaml_;

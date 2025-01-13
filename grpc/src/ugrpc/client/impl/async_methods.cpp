@@ -93,7 +93,7 @@ RpcData::RpcData(impl::CallParams&& params, CallKind call_kind)
 }
 
 RpcData::~RpcData() {
-    UASSERT(std::holds_alternative<std::monostate>(invocation_));
+    invocation_.emplace<std::monostate>();
 
     if (context_ && !IsFinished()) {
         UASSERT(span_);
@@ -215,8 +215,6 @@ FinishAsyncMethodInvocation& RpcData::GetFinishAsyncMethodInvocation() noexcept 
     return std::get<FinishAsyncMethodInvocation>(invocation_);
 }
 
-bool RpcData::GetAndSetFinishProcessed() noexcept { return std::exchange(finish_processed_, true); }
-
 bool RpcData::HoldsAsyncMethodInvocationDebug() noexcept {
     return std::holds_alternative<AsyncMethodInvocation>(invocation_);
 }
@@ -225,16 +223,32 @@ bool RpcData::HoldsFinishAsyncMethodInvocationDebug() noexcept {
     return std::holds_alternative<FinishAsyncMethodInvocation>(invocation_);
 }
 
+bool RpcData::IsFinishProcessed() const noexcept { return finish_processed_; }
+
+void RpcData::SetFinishProcessed() noexcept {
+    UASSERT(!finish_processed_);
+    finish_processed_ = true;
+}
+
+bool RpcData::IsStatusExtracted() const noexcept { return status_extracted_; }
+
+void RpcData::SetStatusExtracted() noexcept {
+    UASSERT(!status_extracted_);
+    status_extracted_ = true;
+}
+
 grpc::Status& RpcData::GetStatus() noexcept { return status_; }
 
-RpcData::AsyncMethodInvocationGuard::AsyncMethodInvocationGuard(RpcData& data) noexcept : data_(data) {}
+ParsedGStatus& RpcData::GetParsedGStatus() noexcept { return parsed_g_status_; }
+
+RpcData::AsyncMethodInvocationGuard::AsyncMethodInvocationGuard(RpcData& data) noexcept : data_(data) {
+    UASSERT(!std::holds_alternative<std::monostate>(data_.invocation_));
+}
 
 RpcData::AsyncMethodInvocationGuard::~AsyncMethodInvocationGuard() noexcept {
     UASSERT(!std::holds_alternative<std::monostate>(data_.invocation_));
     if (!disarm_) {
         data_.invocation_.emplace<std::monostate>();
-
-        data_.GetStatus() = grpc::Status{};
     }
 }
 

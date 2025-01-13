@@ -119,15 +119,20 @@ public:
     // we use two different invocation types
     FinishAsyncMethodInvocation& GetFinishAsyncMethodInvocation() noexcept;
 
-    bool GetAndSetFinishProcessed() noexcept;
-
-    // This are for asserts and invariants. Do NOT branch actual code
+    // These are for asserts and invariants. Do NOT branch actual code
     // based on these two functions. Branching based on these two functions
     // is considered UB, no diagnostics required.
     bool HoldsAsyncMethodInvocationDebug() noexcept;
     bool HoldsFinishAsyncMethodInvocationDebug() noexcept;
 
+    bool IsFinishProcessed() const noexcept;
+    void SetFinishProcessed() noexcept;
+
+    bool IsStatusExtracted() const noexcept;
+    void SetStatusExtracted() noexcept;
+
     grpc::Status& GetStatus() noexcept;
+    ParsedGStatus& GetParsedGStatus() noexcept;
 
     class AsyncMethodInvocationGuard {
     public:
@@ -159,6 +164,11 @@ private:
 
     CallKind call_kind_{};
 
+    grpc::Status status_;
+    ParsedGStatus parsed_g_status_;
+    bool finish_processed_{false};
+    bool status_extracted_{false};
+
     // This data is common for all types of grpc calls - unary and streaming
     // However, in unary call the call is finished as soon as grpc core
     // gives us back a response - so for unary call we use
@@ -167,10 +177,9 @@ private:
     // In stream response, we use AsyncMethodInvocation for every intermediate
     // Read* call, because we don't need to close span and/or account stats
     // when finishing Read* call.
+    //
+    // This field must go after other fields to be destroyed first!
     std::variant<std::monostate, AsyncMethodInvocation, FinishAsyncMethodInvocation> invocation_;
-    bool finish_processed_{false};
-
-    grpc::Status status_;
 };
 
 void CheckOk(RpcData& data, AsyncMethodInvocation::WaitStatus status, std::string_view stage);
@@ -203,7 +212,7 @@ void Finish(
     PrepareFinish(data);
 
     FinishAsyncMethodInvocation finish(data);
-    auto& status = finish.GetStatus();
+    auto& status = data.GetStatus();
     stream.Finish(&status, finish.GetTag());
 
     const auto wait_status = Wait(finish, data.GetContext());
@@ -212,7 +221,7 @@ void Finish(
         if (throw_on_error) throw RpcCancelledError(data.GetCallName(), "Finish");
     }
     ProcessFinishResult(
-        data, wait_status, std::move(status), std::move(finish.GetParsedGStatus()), post_finish, throw_on_error
+        data, wait_status, std::move(status), std::move(data.GetParsedGStatus()), post_finish, throw_on_error
     );
 }
 
