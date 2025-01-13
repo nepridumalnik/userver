@@ -44,23 +44,18 @@ public:
     struct Event final {
         /// @brief Constructor.
         /// @param name Event name.
+        explicit Event(std::string_view name);
+
+        /// @brief Constructor.
+        /// @param name Event name.
         /// @param time_unix_nano Event timestamp.
-        Event(
-            std::string_view name,
-            double time_unix_nano = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                                        std::chrono::system_clock::now().time_since_epoch()
-            )
-                                        .count()
-        );
-
-        /// @brief Default constructor.
-        Event() = default;
-
-        /// @brief Event timestamp.
-        double time_unix_nano{};
+        Event(std::string_view name, uint64_t time_unix_nano);
 
         /// @brief Event name.
         std::string name;
+
+        /// @brief Event timestamp.
+        uint64_t time_unix_nano{};
     };
 
     explicit Span(
@@ -188,7 +183,7 @@ public:
     void AddNonInheritableTags(const logging::LogExtra&);
 
     /// Add an event to Span.
-    void AddEvent(const std::string_view event_name);
+    void AddEvent(std::string_view event_name);
 
     /// Set span status.
     void SetStatus(StatusCode status, const std::string_view description);
