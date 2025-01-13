@@ -369,7 +369,7 @@ void Span::AddTagFrozen(std::string key, logging::LogExtra::Value value) {
     pimpl_->log_extra_inheritable_.Extend(std::move(key), std::move(value), logging::LogExtra::ExtendType::kFrozen);
 }
 
-void Span::AddEvent(const std::string_view event_name) { pimpl_->events_.emplace_back(event_name); }
+void Span::AddEvent(std::string_view event_name) { pimpl_->events_.emplace_back(event_name); }
 
 void Span::SetStatus(StatusCode status, const std::string_view description) {
     if (status == StatusCode::kUnset) {
@@ -433,7 +433,10 @@ const Span::Impl* GetParentSpanImpl() {
     return !spans_ptr || spans_ptr->empty() ? nullptr : &spans_ptr->back();
 }
 
-Span::Event::Event(std::string_view name, double time_unix_nano) : time_unix_nano{time_unix_nano}, name{name} {}
+Span::Event::Event(std::string_view name)
+    : Span::Event{name, static_cast<uint64_t>(std::chrono::system_clock::now().time_since_epoch().count())} {}
+
+Span::Event::Event(std::string_view name, uint64_t time_unix_nano) : name{name}, time_unix_nano{time_unix_nano} {}
 
 namespace impl {
 

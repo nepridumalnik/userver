@@ -38,13 +38,13 @@ std::vector<tracing::Span::Event> GetEventsFromValue(const std::string_view valu
     }
 
     for (const auto& [key, value] : formats::common::Items(json_value)) {
-        events.emplace_back(key, value.As<double>());
+        events.emplace_back(key, value.As<uint64_t>());
     }
 
     return events;
 }
 
-void WriteEventsFromValue(::opentelemetry::proto::trace::v1::Span& span, const std::string_view value) {
+void WriteEventsFromValue(::opentelemetry::proto::trace::v1::Span& span, std::string_view value) {
     std::vector<tracing::Span::Event> events = GetEventsFromValue(value);
 
     for (const auto& event : events) {
