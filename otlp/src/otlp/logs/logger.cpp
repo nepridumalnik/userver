@@ -46,7 +46,7 @@ std::vector<tracing::Span::Event> GetEventsFromValue(const std::string_view valu
 }
 
 void WriteEventsFromValue(::opentelemetry::proto::trace::v1::Span& span, std::string_view value) {
-    std::vector<tracing::Span::Event> events = GetEventsFromValue(value);
+    const std::vector<tracing::Span::Event> events = GetEventsFromValue(value);
     span.mutable_events()->Reserve(events.size());
 
     for (const auto& event : events) {
