@@ -113,15 +113,15 @@ void Span::Impl::DoLogOpenTracing(logging::impl::TagWriter writer) const {
     writer.PutTag(jaeger::kDuration, duration_microseconds);
     writer.PutTag(jaeger::kOperationName, name_);
 
+    formats::json::StringBuilder tags;
     {
-        formats::json::StringBuilder tags;
         const formats::json::StringBuilder::ArrayGuard guard(tags);
         AddOpentracingTags(tags, log_extra_inheritable_);
         if (log_extra_local_) {
             AddOpentracingTags(tags, *log_extra_local_);
         }
-        writer.PutTag("tags", tags.GetStringView());
     }
+    writer.PutTag("tags", tags.GetStringView());
 }
 
 void Span::Impl::LogEvents(logging::impl::TagWriter& writer) const {
