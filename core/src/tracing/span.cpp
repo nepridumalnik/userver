@@ -371,6 +371,8 @@ void Span::AddTagFrozen(std::string key, logging::LogExtra::Value value) {
 
 void Span::AddEvent(std::string_view event_name) { pimpl_->events_.emplace_back(event_name); }
 
+// Opentelemetry implementation:
+// https://github.com/open-telemetry/opentelemetry-cpp/blob/v1.18.0/exporters/zipkin/src/recordable.cc#L220
 void Span::SetStatus(StatusCode status, const std::string_view description) {
     if (status == StatusCode::kUnset) {
         return;
