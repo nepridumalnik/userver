@@ -40,7 +40,10 @@ public:
         kError,  // The operation contains an error.
     };
 
-    /// @brief Create span event
+    /// @brief Span event.
+    /// @see
+    /// https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/trace/v1/trace.proto#L222.
+    /// @todo Implement attributes.
     struct Event final {
         /// @brief Constructor.
         /// @param name Event name.
