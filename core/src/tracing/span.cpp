@@ -378,9 +378,10 @@ void Span::SetStatus(StatusCode status, const std::string_view description) {
         return;
     }
 
+    AddTag("otel.status_description", std::string{description});
+
     if (status == StatusCode::kError) {
         // Error description is required by OpenTelemetry
-        AddTag("otel.status_description", std::string{description});
 
         // Service data
         AddTag("otel.status_code", "ERROR");
