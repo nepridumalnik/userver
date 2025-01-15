@@ -136,7 +136,10 @@ UTEST_F(Span, LogBufferSize) {
 }
 
 UTEST_F(Span, SourceLocation) {
+    // clang-format off
     { tracing::Span span("span_name"); }
+    // clang-format on
+
     logging::LogFlush();
     EXPECT_THAT(GetStreamString(), HasSubstr("module=TestBody ( "));
     EXPECT_THAT(GetStreamString(), HasSubstr("userver/core/src/tracing"));
@@ -204,7 +207,10 @@ UTEST_F(OpentracingSpan, Tags) {
 
 UTEST_F(OpentracingSpan, FromTracerWithServiceName) {
     auto tracer = tracing::MakeTracer("test_service", tracing::Tracer::GetTracer()->GetOptionalLogger());
+    // clang-format off
     { tracing::Span span(tracer, "span_name", nullptr, tracing::ReferenceType::kChild); }
+    // clang-format on
+
     FlushOpentracing();
     const auto log_str = GetOtStreamString();
     EXPECT_THAT(log_str, HasSubstr("service_name=test_service"));
@@ -430,6 +436,7 @@ UTEST_F(Span, NoLogPrefixes) {
     };
     tracing::Tracer::SetNoLogSpans(std::move(no_logs));
 
+    // clang-format off
     { tracing::Span a{kIgnorePrefix0 + "foo"}; }
     { tracing::Span a{kLogSpan0}; }
     { tracing::Span a{kLogSpan1}; }
@@ -442,6 +449,7 @@ UTEST_F(Span, NoLogPrefixes) {
     { tracing::Span a{kIgnorePrefix1}; }
     { tracing::Span a{kIgnorePrefix2}; }
     { tracing::Span a{kIgnoreSpan}; }
+    // clang-format on
 
     logging::LogFlush();
 
@@ -479,6 +487,7 @@ UTEST_F(Span, NoLogMixed) {
     const std::string kIgnorePrefix1 = "skip";
     const std::string kIgnorePrefix2 = "do_not_keep";
 
+    // clang-format off
     { tracing::Span a{kIgnorePrefix0 + "oops"}; }
     { tracing::Span a{kLogSpan0}; }
     { tracing::Span a{kLogSpan1}; }
@@ -492,6 +501,7 @@ UTEST_F(Span, NoLogMixed) {
     { tracing::Span a{kIgnorePrefix1}; }
     { tracing::Span a{kIgnorePrefix2}; }
     { tracing::Span a{kIgnoreSpan}; }
+    // clang-format on
 
     logging::LogFlush();
 
@@ -687,6 +697,44 @@ UTEST_F(Span, MakeSpanWithParentIdTraceIdLinkWithExisting) {
         EXPECT_EQ(span.GetParentId(), parent_id);
         EXPECT_EQ(span.GetLink(), link);
     }
+}
+
+UTEST_F(Span, MakeSpanEvent) {
+    {
+        tracing::Span root_span("root_span");
+
+        auto error_span = root_span.CreateChild("error_span");
+        error_span.AddEvent("error_event");
+    }
+
+    logging::LogFlush();
+
+    const auto logs_raw = GetStreamString();
+
+    EXPECT_THAT(logs_raw, HasSubstr("events={\"error_event\":"));
+    EXPECT_THAT(logs_raw, HasSubstr("root_span"));
+    EXPECT_THAT(logs_raw, HasSubstr("error_span"));
+}
+
+UTEST_F(Span, MakeSpanSetStatus) {
+    {
+        tracing::Span error_span("error_span");
+        error_span.SetStatus(tracing::Span::StatusCode::kError, "Error description");
+        tracing::Span ok_span("ok_span");
+        ok_span.SetStatus(tracing::Span::StatusCode::kOk, "Ok description");
+    }
+
+    logging::LogFlush();
+
+    const auto logs_raw = GetStreamString();
+
+    EXPECT_THAT(logs_raw, HasSubstr("error_span"));
+    EXPECT_THAT(logs_raw, HasSubstr("otel_status_description=Error description"));
+    EXPECT_THAT(logs_raw, HasSubstr("otel_status_code=ERROR"));
+
+    EXPECT_THAT(logs_raw, HasSubstr("ok_span"));
+    EXPECT_THAT(logs_raw, HasSubstr("otel_status_description=Ok description"));
+    EXPECT_THAT(logs_raw, HasSubstr("otel_status_code=OK"));
 }
 
 USERVER_NAMESPACE_END
