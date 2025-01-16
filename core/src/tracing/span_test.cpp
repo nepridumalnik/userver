@@ -699,21 +699,18 @@ UTEST_F(Span, MakeSpanWithParentIdTraceIdLinkWithExisting) {
     }
 }
 
-UTEST_F(Span, MakeSpanEvent) {
+UTEST_F(OpentracingSpan, MakeSpanEvent) {
     {
         tracing::Span root_span("root_span");
-
-        auto error_span = root_span.CreateChild("event_span");
-        error_span.AddEvent("necessary_event");
+        root_span.AddEvent("important_event");
     }
 
-    logging::LogFlush();
+    FlushOpentracing();
 
-    [[clang::optnone]] const auto logs_raw = GetStreamString();
+    const auto logs_raw = GetOtStreamString();
 
-    EXPECT_THAT(logs_raw, HasSubstr("events={\"necessary_event\":"));
+    EXPECT_THAT(logs_raw, HasSubstr("events={\"important_event\":"));
     EXPECT_THAT(logs_raw, HasSubstr("root_span"));
-    EXPECT_THAT(logs_raw, HasSubstr("event_span"));
 }
 
 USERVER_NAMESPACE_END
