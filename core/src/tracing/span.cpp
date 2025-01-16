@@ -149,7 +149,6 @@ void Span::Impl::PutIntoLogger(logging::impl::TagWriter writer) && {
     }
     writer.PutLogExtra(log_extra_inheritable_);
 
-    LogEvents(writer);
     LogOpenTracing();
 }
 
