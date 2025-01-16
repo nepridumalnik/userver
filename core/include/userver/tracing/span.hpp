@@ -33,10 +33,11 @@ class Span final {
 public:
     class Impl;
 
-    /// @brief Span event.
+    /// @brief Span event -- time-stamped annotation of the span with user-provided text description.
+    /// @see https://opentelemetry.io/docs/concepts/signals/traces/#span-events
     /// @see
-    /// https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/trace/v1/trace.proto#L222.
-    /// @todo Implement attributes.
+    /// https://github.com/open-telemetry/opentelemetry-proto/blob/v1.3.2/opentelemetry/proto/trace/v1/trace.proto#L220
+    /// @todo Implement event attributes.
     struct Event final {
         /// @brief Constructor.
         /// @param name Event name.
