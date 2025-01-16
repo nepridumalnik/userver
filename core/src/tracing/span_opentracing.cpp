@@ -124,24 +124,20 @@ void Span::Impl::DoLogOpenTracing(logging::impl::TagWriter writer) const {
         }
     }
     writer.PutTag("tags", tags.GetStringView());
-}
 
-void Span::Impl::LogEvents(logging::impl::TagWriter& writer) const {
-    if (events_.empty()) {
-        return;
-    }
+    if (!events_.empty()) {
+        formats::json::StringBuilder events;
+        {
+            const formats::json::StringBuilder::ObjectGuard event_guard(events);
 
-    formats::json::StringBuilder events;
-    {
-        const formats::json::StringBuilder::ObjectGuard event_guard(events);
-
-        for (const auto& event : events_) {
-            events.Key(event.name);
-            events.WriteUInt64(event.time_unix_nano);
+            for (const auto& event : events_) {
+                events.Key(event.name);
+                events.WriteUInt64(event.time_unix_nano);
+            }
         }
-    }
 
-    writer.PutTag("events", events.GetStringView());
+        writer.PutTag("events", events.GetStringView());
+    }
 }
 
 void Span::Impl::AddOpentracingTags(formats::json::StringBuilder& output, const logging::LogExtra& input) {

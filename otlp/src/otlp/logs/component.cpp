@@ -44,7 +44,6 @@ LoggerComponent::LoggerComponent(const components::ComponentConfig& config, cons
     logger_config.extra_attributes = config["extra-attributes"].As<std::unordered_map<std::string, std::string>>({});
     logger_config.attributes_mapping =
         config["attributes-mapping"].As<std::unordered_map<std::string, std::string>>({});
-
     logger_config.logs_sink = config["sinks"]["logs"].As<SinkType>(SinkType::kOtlp);
     logger_config.tracing_sink = config["sinks"]["tracing"].As<SinkType>(SinkType::kOtlp);
 
