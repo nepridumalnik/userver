@@ -32,6 +32,7 @@ std::vector<tracing::Span::Event> GetEventsFromValue(const std::string_view valu
     std::vector<tracing::Span::Event> events;
 
     const auto json_value = formats::json::FromString(value);
+    events.reserve(json_value.GetSize());
 
     if (!json_value.IsObject()) {
         throw std::runtime_error("Expected JSON object in \"value\"");

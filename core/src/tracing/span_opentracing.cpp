@@ -68,6 +68,20 @@ void GetTagObject(
     builder.WriteString(key);
 }
 
+std::string MakeTagFromEvents(const std::vector<Span::Event>& events) {
+    formats::json::StringBuilder builder;
+    {
+        const formats::json::StringBuilder::ObjectGuard event_guard(builder);
+
+        for (const auto& event : events) {
+            builder.Key(event.name);
+            builder.WriteUInt64(event.time_unix_nano);
+        }
+    }
+
+    return builder.GetString();
+}
+
 constexpr std::string_view kOperationName = "operation_name";
 constexpr std::string_view kTraceId = "trace_id";
 constexpr std::string_view kParentId = "parent_id";
@@ -77,6 +91,9 @@ constexpr std::string_view kServiceName = "service_name";
 constexpr std::string_view kStartTime = "start_time";
 constexpr std::string_view kStartTimeMillis = "start_time_millis";
 constexpr std::string_view kDuration = "duration";
+
+constexpr std::string_view kTags = "tags";
+constexpr std::string_view kEvents = "events";
 
 }  // namespace jaeger
 
@@ -123,20 +140,11 @@ void Span::Impl::DoLogOpenTracing(logging::impl::TagWriter writer) const {
             AddOpentracingTags(tags, *log_extra_local_);
         }
     }
-    writer.PutTag("tags", tags.GetStringView());
+    writer.PutTag(jaeger::kTags, tags.GetStringView());
 
     if (!events_.empty()) {
-        formats::json::StringBuilder events;
-        {
-            const formats::json::StringBuilder::ObjectGuard event_guard(events);
-
-            for (const auto& event : events_) {
-                events.Key(event.name);
-                events.WriteUInt64(event.time_unix_nano);
-            }
-        }
-
-        writer.PutTag("events", events.GetStringView());
+        const auto events_tag = jaeger::MakeTagFromEvents(events_);
+        writer.PutTag(jaeger::kEvents, events_tag);
     }
 }
 
