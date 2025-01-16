@@ -703,38 +703,17 @@ UTEST_F(Span, MakeSpanEvent) {
     {
         tracing::Span root_span("root_span");
 
-        auto error_span = root_span.CreateChild("error_span");
-        error_span.AddEvent("error_event");
+        auto error_span = root_span.CreateChild("event_span");
+        error_span.AddEvent("necessary_event");
     }
 
     logging::LogFlush();
 
-    const auto logs_raw = GetStreamString();
+    [[clang::optnone]] const auto logs_raw = GetStreamString();
 
-    EXPECT_THAT(logs_raw, HasSubstr("events={\"error_event\":"));
+    EXPECT_THAT(logs_raw, HasSubstr("events={\"necessary_event\":"));
     EXPECT_THAT(logs_raw, HasSubstr("root_span"));
-    EXPECT_THAT(logs_raw, HasSubstr("error_span"));
-}
-
-UTEST_F(Span, MakeSpanSetStatus) {
-    {
-        tracing::Span error_span("error_span");
-        error_span.SetStatus(tracing::Span::StatusCode::kError, "Error description");
-        tracing::Span ok_span("ok_span");
-        ok_span.SetStatus(tracing::Span::StatusCode::kOk, "Ok description");
-    }
-
-    logging::LogFlush();
-
-    const auto logs_raw = GetStreamString();
-
-    EXPECT_THAT(logs_raw, HasSubstr("error_span"));
-    EXPECT_THAT(logs_raw, HasSubstr("otel_status_description=Error description"));
-    EXPECT_THAT(logs_raw, HasSubstr("otel_status_code=ERROR"));
-
-    EXPECT_THAT(logs_raw, HasSubstr("ok_span"));
-    EXPECT_THAT(logs_raw, HasSubstr("otel_status_description=Ok description"));
-    EXPECT_THAT(logs_raw, HasSubstr("otel_status_code=OK"));
+    EXPECT_THAT(logs_raw, HasSubstr("event_span"));
 }
 
 USERVER_NAMESPACE_END

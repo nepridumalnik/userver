@@ -371,27 +371,6 @@ void Span::AddTagFrozen(std::string key, logging::LogExtra::Value value) {
 
 void Span::AddEvent(std::string_view event_name) { pimpl_->events_.emplace_back(event_name); }
 
-// Opentelemetry implementation:
-// https://github.com/open-telemetry/opentelemetry-cpp/blob/v1.18.0/exporters/zipkin/src/recordable.cc#L220
-void Span::SetStatus(StatusCode status, const std::string_view description) {
-    if (status == StatusCode::kUnset) {
-        return;
-    }
-
-    AddTag("otel.status_description", std::string{description});
-
-    if (status == StatusCode::kError) {
-        // Error description is required by OpenTelemetry
-
-        // Service data
-        AddTag("otel.status_code", "ERROR");
-        AddTag("error", "true");
-    } else {
-        AddTag("otel.status_code", "OK");
-        AddTag("error", "false");
-    }
-}
-
 void Span::SetLink(std::string link) { AddTagFrozen(kLinkTag, std::move(link)); }
 
 void Span::SetParentLink(std::string parent_link) { AddTagFrozen(kParentLinkTag, std::move(parent_link)); }

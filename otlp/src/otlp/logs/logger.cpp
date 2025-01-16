@@ -213,13 +213,6 @@ void Logger::Trace(logging::Level level, std::string_view msg) {
                 WriteEventsFromValue(span, value);
                 return true;
             }
-            if (key == "error") {
-                auto attributes = span.add_attributes();
-                attributes->set_key(std::string{key});
-                attributes->mutable_value()->set_bool_value(value == "true");
-
-                return true;
-            }
 
             auto attributes = span.add_attributes();
             attributes->set_key(std::string{MapAttribute(key)});

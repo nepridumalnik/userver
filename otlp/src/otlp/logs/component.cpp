@@ -45,14 +45,6 @@ LoggerComponent::LoggerComponent(const components::ComponentConfig& config, cons
     logger_config.attributes_mapping =
         config["attributes-mapping"].As<std::unordered_map<std::string, std::string>>({});
 
-    // Define error mapping
-    if (logger_config.attributes_mapping.find("otel_status_code") == logger_config.attributes_mapping.end()) {
-        logger_config.attributes_mapping["otel_status_code"] = "otel.status_code";
-    }
-    if (logger_config.attributes_mapping.find("otel_status_description") == logger_config.attributes_mapping.end()) {
-        logger_config.attributes_mapping["otel_status_description"] = "otel.status_description";
-    }
-
     logger_config.logs_sink = config["sinks"]["logs"].As<SinkType>(SinkType::kOtlp);
     logger_config.tracing_sink = config["sinks"]["tracing"].As<SinkType>(SinkType::kOtlp);
 

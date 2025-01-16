@@ -33,13 +33,6 @@ class Span final {
 public:
     class Impl;
 
-    /// @brief Operation status code.
-    enum class StatusCode : uint8_t {
-        kUnset,  // Default status.
-        kOk,     // Operation has completed successfully.
-        kError,  // The operation contains an error.
-    };
-
     /// @brief Span event.
     /// @see
     /// https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/trace/v1/trace.proto#L222.
@@ -187,9 +180,6 @@ public:
 
     /// Add an event to Span.
     void AddEvent(std::string_view event_name);
-
-    /// Set span status.
-    void SetStatus(StatusCode status, const std::string_view description);
 
     /// @brief Sets level for tags logging
     void SetLogLevel(logging::Level log_level);
