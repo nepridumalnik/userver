@@ -36,7 +36,7 @@ struct EventAttributeWriteVisitor {
     template <typename T>
     void operator()(const T& value) {
         auto* attribute = span_event->add_attributes();
-        attribute->set_key(std::string{key});
+        attribute->set_key(key);
 
         if constexpr (std::is_same_v<T, std::string>) {
             attribute->mutable_value()->set_string_value(value);
