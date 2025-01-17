@@ -48,6 +48,25 @@ struct LogExtraValueVisitor {
     void operator()(int val) { string_value = std::to_string(val); }
 };
 
+struct EventAttributeWriteVisitor {
+    explicit EventAttributeWriteVisitor(formats::json::StringBuilder& builder) : builder{builder} {}
+
+    template <typename T>
+    void operator()(const T& value) {
+        if constexpr (std::is_same_v<T, std::string>) {
+            builder.WriteString(value);
+        } else if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>) {
+            builder.WriteUInt64(value);
+        } else if constexpr (std::is_integral_v<T>) {
+            builder.WriteInt64(value);
+        } else if constexpr (std::is_floating_point_v<T>) {
+            builder.WriteDouble(value);
+        }
+    }
+
+    formats::json::StringBuilder& builder;
+};
+
 void GetTagObject(
     formats::json::StringBuilder& builder,
     std::string_view key,
@@ -68,14 +87,32 @@ void GetTagObject(
     builder.WriteString(key);
 }
 
+void HandleEventAttributes(const Span::Event& events, formats::json::StringBuilder& builder) {
+    const formats::json::StringBuilder::ArrayGuard attributes_guard(builder);
+
+    for (const auto& [key, value] : events.attributes) {
+        const formats::json::StringBuilder::ObjectGuard guard(builder);
+
+        builder.Key(key);
+        EventAttributeWriteVisitor write_visitor(builder);
+        std::visit(write_visitor, value);
+    }
+}
+
 std::string MakeTagFromEvents(const std::vector<Span::Event>& events) {
     formats::json::StringBuilder builder;
     {
-        const formats::json::StringBuilder::ObjectGuard event_guard(builder);
+        const formats::json::StringBuilder::ArrayGuard array_guard(builder);
 
         for (const auto& event : events) {
-            builder.Key(event.name);
+            const formats::json::StringBuilder::ObjectGuard guard(builder);
+
+            builder.Key("name");
+            builder.WriteString(event.name);
+            builder.Key("time_unix_nano");
             builder.WriteUInt64(event.time_unix_nano);
+
+            HandleEventAttributes(event, builder);
         }
     }
 

@@ -5,6 +5,7 @@
 
 #include <optional>
 #include <string_view>
+#include <unordered_map>
 
 #include <userver/logging/log.hpp>
 #include <userver/logging/log_extra.hpp>
@@ -36,12 +37,21 @@ public:
     /// @brief Span event -- time-stamped annotation of the span with user-provided text description.
     /// @see https://opentelemetry.io/docs/concepts/signals/traces/#span-events
     /// @see
-    /// https://github.com/open-telemetry/opentelemetry-proto/blob/v1.3.2/opentelemetry/proto/trace/v1/trace.proto#L220
-    /// @todo Implement event attributes.
+    /// https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/trace/v1/trace.proto#L222.
     struct Event final {
+        using Value = std::
+            variant<std::string, int, long, long long, unsigned int, unsigned long, unsigned long long, float, double>;
+        using Key = std::string;
+        using KeyValue = std::unordered_map<Key, Value>;
+
         /// @brief Constructor.
         /// @param name Event name.
         explicit Event(std::string_view name);
+
+        /// @brief Constructor.
+        /// @param name Event name.
+        /// @param attributes Key-value attributes.
+        Event(std::string_view name, KeyValue&& attributes);
 
         /// @brief Constructor.
         /// @param name Event name.
@@ -53,6 +63,14 @@ public:
 
         /// @brief Event timestamp.
         uint64_t time_unix_nano{};
+
+        /// @brief Attributes.
+        /// @see
+        /// https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/common/v1/common.proto#L64
+        /// @see
+        /// https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/trace/v1/trace.proto#L233
+        /// @details Collection of unique key-value pairs.
+        KeyValue attributes;
     };
 
     explicit Span(
@@ -181,6 +199,9 @@ public:
 
     /// Add an event to Span.
     void AddEvent(std::string_view event_name);
+
+    /// Add an event to Span.
+    void AddEvent(Event&& event);
 
     /// @brief Sets level for tags logging
     void SetLogLevel(logging::Level log_level);

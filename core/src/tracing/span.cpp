@@ -370,6 +370,8 @@ void Span::AddTagFrozen(std::string key, logging::LogExtra::Value value) {
 
 void Span::AddEvent(std::string_view event_name) { pimpl_->events_.emplace_back(event_name); }
 
+void Span::AddEvent(Span::Event&& event) { pimpl_->events_.emplace_back(event); }
+
 void Span::SetLink(std::string link) { AddTagFrozen(kLinkTag, std::move(link)); }
 
 void Span::SetParentLink(std::string parent_link) { AddTagFrozen(kParentLinkTag, std::move(parent_link)); }
@@ -416,6 +418,10 @@ const Span::Impl* GetParentSpanImpl() {
 
 Span::Event::Event(std::string_view name)
     : Span::Event{name, static_cast<uint64_t>(std::chrono::system_clock::now().time_since_epoch().count())} {}
+
+Span::Event::Event(std::string_view name, Span::Event::KeyValue&& attributes) : Span::Event{name} {
+    this->attributes = std::move(attributes);
+}
 
 Span::Event::Event(std::string_view name, uint64_t time_unix_nano) : name{name}, time_unix_nano{time_unix_nano} {}
 
