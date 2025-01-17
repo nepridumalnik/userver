@@ -29,6 +29,28 @@ constexpr std::string_view kAttributeKey = "attributes";
 
 const std::string kTimestampFormat = "%Y-%m-%dT%H:%M:%E*S";
 
+struct EventAttributeWriteVisitor {
+    EventAttributeWriteVisitor(::opentelemetry::proto::trace::v1::Span_Event* span_event, std::string_view key)
+        : span_event{span_event}, key{key} {}
+
+    template <typename T>
+    void operator()(const T& value) {
+        auto* attribute = span_event->add_attributes();
+        attribute->set_key(std::string{key});
+
+        if constexpr (std::is_same_v<T, std::string>) {
+            attribute->mutable_value()->set_string_value(value);
+        } else if constexpr (std::is_integral_v<T>) {
+            attribute->mutable_value()->set_int_value(value);
+        } else if constexpr (std::is_floating_point_v<T>) {
+            attribute->mutable_value()->set_double_value(value);
+        }
+    }
+
+    ::opentelemetry::proto::trace::v1::Span_Event* span_event;
+    std::string_view key;
+};
+
 void GetAttributes(formats::json::Value item, tracing::Span::Event& event) {
     if (item.HasMember(kAttributeKey)) {
         item[kAttributeKey].CheckObject();
@@ -70,6 +92,11 @@ void WriteEventsFromValue(::opentelemetry::proto::trace::v1::Span& span, std::st
         auto* event_proto = span.add_events();
         event_proto->set_name(event.name);
         event_proto->set_time_unix_nano(event.time_unix_nano);
+
+        for (const auto& [key, value] : event.attributes) {
+            EventAttributeWriteVisitor visitor{event_proto, key};
+            std::visit(visitor, value);
+        }
     }
 }
 
