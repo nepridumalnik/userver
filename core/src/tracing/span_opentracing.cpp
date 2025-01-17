@@ -88,11 +88,10 @@ void GetTagObject(
 }
 
 void HandleEventAttributes(const Span::Event& events, formats::json::StringBuilder& builder) {
-    const formats::json::StringBuilder::ArrayGuard attributes_guard(builder);
+    builder.Key("attributes");
+    const formats::json::StringBuilder::ObjectGuard attributes_guard(builder);
 
     for (const auto& [key, value] : events.attributes) {
-        const formats::json::StringBuilder::ObjectGuard guard(builder);
-
         builder.Key(key);
         EventAttributeWriteVisitor write_visitor(builder);
         std::visit(write_visitor, value);

@@ -228,6 +228,9 @@ public:
     /// @throw MemberMissingException if `*this` is not an array or null.
     void CheckArrayOrNull() const;
 
+    /// @throw MemberMissingException if `*this` is not an array.
+    void CheckArray() const;
+
     /// @throw TypeMismatchException if `*this` is not a map or null.
     void CheckObjectOrNull() const;
 

@@ -413,6 +413,12 @@ void Value::CheckArrayOrNull() const {
     }
 }
 
+void Value::CheckArray() const {
+    if (!IsArray()) {
+        throw TypeMismatchException(GetExtendedType(), impl::arrayValue, GetPath());
+    }
+}
+
 void Value::CheckObjectOrNull() const {
     if (!IsNull() && !IsObject()) {
         throw TypeMismatchException(GetExtendedType(), impl::objectValue, GetPath());

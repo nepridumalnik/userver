@@ -25,8 +25,25 @@ namespace {
 constexpr std::string_view kTelemetrySdkLanguage = "telemetry.sdk.language";
 constexpr std::string_view kTelemetrySdkName = "telemetry.sdk.name";
 constexpr std::string_view kServiceName = "service.name";
+constexpr std::string_view kAttributeKey = "attributes";
 
 const std::string kTimestampFormat = "%Y-%m-%dT%H:%M:%E*S";
+
+void GetAttributes(formats::json::Value item, tracing::Span::Event& event) {
+    if (item.HasMember(kAttributeKey)) {
+        item[kAttributeKey].CheckObject();
+
+        for (const auto& [key, value] : formats::common::Items(item[kAttributeKey])) {
+            if (value.IsString()) {
+                event.attributes.emplace(key, value.As<std::string>());
+            } else if (value.IsDouble()) {
+                event.attributes.emplace(key, value.As<double>());
+            } else if (value.IsInt()) {
+                event.attributes.emplace(key, value.As<int64_t>());
+            }
+        }
+    }
+}
 
 std::vector<tracing::Span::Event> GetEventsFromValue(const std::string_view value) {
     std::vector<tracing::Span::Event> events;
@@ -34,12 +51,12 @@ std::vector<tracing::Span::Event> GetEventsFromValue(const std::string_view valu
     const auto json_value = formats::json::FromString(value);
     events.reserve(json_value.GetSize());
 
-    if (!json_value.IsObject()) {
-        throw std::runtime_error("Expected JSON object in \"value\"");
-    }
+    json_value.CheckArray();
 
-    for (const auto& [key, value] : formats::common::Items(json_value)) {
-        events.emplace_back(key, value.As<uint64_t>());
+    for (const auto& item : json_value) {
+        tracing::Span::Event event{item["name"].As<std::string>(), item["time_unix_nano"].As<uint64_t>()};
+        GetAttributes(item, event);
+        events.emplace_back(std::move(event));
     }
 
     return events;

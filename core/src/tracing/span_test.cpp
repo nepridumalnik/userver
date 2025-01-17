@@ -738,9 +738,9 @@ UTEST_F(OpentracingSpan, MakeSpanEventWithAttributes) {
     EXPECT_THAT(logs_raw, HasSubstr("root_span"));
 
     // Attributes
-    EXPECT_THAT(logs_raw, HasSubstr("[{\"string\":\"value\"}]}"));
-    EXPECT_THAT(logs_raw, HasSubstr("[{\"int\":42}]"));
-    EXPECT_THAT(logs_raw, HasSubstr("[{\"string\":\"another_value\"},{\"float\":123.456},{\"int\":123}]}]"));
+    EXPECT_THAT(logs_raw, HasSubstr("\"attributes\":{\"int\":42}"));
+    EXPECT_THAT(logs_raw, HasSubstr("\"attributes\":{\"string\":\"value\"}"));
+    EXPECT_THAT(logs_raw, HasSubstr("\"attributes\":{\"string\":\"another_value\",\"float\":123.456,\"int\":123}"));
 }
 
 USERVER_NAMESPACE_END
