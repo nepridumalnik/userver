@@ -417,7 +417,13 @@ const Span::Impl* GetParentSpanImpl() {
 }
 
 Span::Event::Event(std::string_view name)
-    : Span::Event{name, static_cast<uint64_t>(std::chrono::system_clock::now().time_since_epoch().count())} {}
+    : Span::Event{
+          name,
+          static_cast<uint64_t>(
+              std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())
+                  .count()
+          )
+      } {}
 
 Span::Event::Event(std::string_view name, Span::Event::KeyValue&& attributes) : Span::Event{name} {
     this->attributes = std::move(attributes);
