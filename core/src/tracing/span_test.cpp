@@ -709,8 +709,38 @@ UTEST_F(OpentracingSpan, MakeSpanEvent) {
 
     const auto logs_raw = GetOtStreamString();
 
-    EXPECT_THAT(logs_raw, HasSubstr("events={\"important_event\":"));
+    EXPECT_THAT(logs_raw, HasSubstr("events=[{\"name\":\"important_event\""));
     EXPECT_THAT(logs_raw, HasSubstr("root_span"));
+}
+
+UTEST_F(OpentracingSpan, MakeSpanEventWithAttributes) {
+    {
+        tracing::Span root_span("root_span");
+        root_span.AddEvent({"important_event_0", {{"int", 42}}});
+        root_span.AddEvent({"important_event_1", {{"string", "value"}}});
+        root_span.AddEvent(
+            {"event_with_many_attributes",
+             {
+                 {"string", "another_value"},
+                 {"int", 123},
+                 {"float", 123.456},
+             }}
+        );
+    }
+
+    FlushOpentracing();
+
+    const auto logs_raw = GetOtStreamString();
+
+    EXPECT_THAT(logs_raw, HasSubstr("events=[{\"name\":\"important_event_0\",\"time_unix_nano\""));
+    EXPECT_THAT(logs_raw, HasSubstr("{\"name\":\"important_event_1\",\"time_unix_nano\""));
+    EXPECT_THAT(logs_raw, HasSubstr("{\"name\":\"event_with_many_attributes\",\"time_unix_nano\""));
+    EXPECT_THAT(logs_raw, HasSubstr("root_span"));
+
+    // Attributes
+    EXPECT_THAT(logs_raw, HasSubstr("[{\"string\":\"value\"}]}"));
+    EXPECT_THAT(logs_raw, HasSubstr("[{\"int\":42}]"));
+    EXPECT_THAT(logs_raw, HasSubstr("[{\"string\":\"another_value\"},{\"float\":123.456},{\"int\":123}]}]"));
 }
 
 USERVER_NAMESPACE_END
