@@ -18,6 +18,15 @@
 
 USERVER_NAMESPACE_BEGIN
 
+namespace formats::parse {
+
+template <typename Value>
+tracing::Span::Event Parse(const Value& value, formats::parse::To<tracing::Span::Event>) {
+    return {value["name"].template As<std::string>(), value["time_unix_nano"].template As<uint64_t>()};
+}
+
+}  // namespace formats::parse
+
 namespace otlp {
 
 namespace {
@@ -76,7 +85,7 @@ std::vector<tracing::Span::Event> GetEventsFromValue(const std::string_view valu
     events.reserve(json_value.GetSize());
 
     for (const auto& item : json_value) {
-        tracing::Span::Event event{item["name"].As<std::string>(), item["time_unix_nano"].As<uint64_t>()};
+        tracing::Span::Event event{item.As<tracing::Span::Event>()};
         GetAttributes(item, event);
         events.emplace_back(std::move(event));
     }
