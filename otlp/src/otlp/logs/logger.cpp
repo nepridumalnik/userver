@@ -30,12 +30,12 @@ constexpr std::string_view kAttributeKey = "attributes";
 const std::string kTimestampFormat = "%Y-%m-%dT%H:%M:%E*S";
 
 struct EventAttributeWriteVisitor {
-    EventAttributeWriteVisitor(::opentelemetry::proto::trace::v1::Span_Event* span_event, std::string_view key)
-        : span_event{span_event}, key{key} {}
+    EventAttributeWriteVisitor(::opentelemetry::proto::trace::v1::Span_Event& span_event, const std::string& key)
+        : key{key}, span_event_{span_event} {}
 
     template <typename T>
     void operator()(const T& value) {
-        auto* attribute = span_event->add_attributes();
+        auto* attribute = span_event_.add_attributes();
         attribute->set_key(key);
 
         if constexpr (std::is_same_v<T, std::string>) {
@@ -47,8 +47,9 @@ struct EventAttributeWriteVisitor {
         }
     }
 
-    ::opentelemetry::proto::trace::v1::Span_Event* span_event;
-    std::string_view key;
+private:
+    const std::string& key;
+    ::opentelemetry::proto::trace::v1::Span_Event& span_event_;
 };
 
 void GetAttributes(formats::json::Value item, tracing::Span::Event& event) {
@@ -71,9 +72,8 @@ std::vector<tracing::Span::Event> GetEventsFromValue(const std::string_view valu
     std::vector<tracing::Span::Event> events;
 
     const auto json_value = formats::json::FromString(value);
-    events.reserve(json_value.GetSize());
-
     json_value.CheckArray();
+    events.reserve(json_value.GetSize());
 
     for (const auto& item : json_value) {
         tracing::Span::Event event{item["name"].As<std::string>(), item["time_unix_nano"].As<uint64_t>()};
@@ -94,8 +94,7 @@ void WriteEventsFromValue(::opentelemetry::proto::trace::v1::Span& span, std::st
         event_proto->set_time_unix_nano(event.time_unix_nano);
 
         for (const auto& [key, value] : event.attributes) {
-            EventAttributeWriteVisitor visitor{event_proto, key};
-            std::visit(visitor, value);
+            std::visit(EventAttributeWriteVisitor{*event_proto, key}, value);
         }
     }
 }

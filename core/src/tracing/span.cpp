@@ -425,7 +425,7 @@ void Span::AddTagFrozen(std::string key, logging::LogExtra::Value value) {
 
 void Span::AddEvent(std::string_view event_name) { pimpl_->events_.emplace_back(event_name); }
 
-void Span::AddEvent(Span::Event&& event) { pimpl_->events_.emplace_back(event); }
+void Span::AddEvent(Span::Event&& event) { pimpl_->events_.emplace_back(std::move(event)); }
 
 void Span::SetLink(std::string link) { AddTagFrozen(kLinkTag, std::move(link)); }
 
