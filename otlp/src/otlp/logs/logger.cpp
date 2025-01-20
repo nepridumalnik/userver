@@ -29,8 +29,8 @@ constexpr std::string_view kAttributeKey = "attributes";
 
 const std::string kTimestampFormat = "%Y-%m-%dT%H:%M:%E*S";
 
-struct EventAttributeWriteVisitor {
-    EventAttributeWriteVisitor(::opentelemetry::proto::trace::v1::Span_Event& span_event, const std::string& key)
+struct AttributeToTraceVisitor {
+    AttributeToTraceVisitor(::opentelemetry::proto::trace::v1::Span_Event& span_event, const std::string& key)
         : key{key}, span_event_{span_event} {}
 
     template <typename T>
@@ -94,7 +94,7 @@ void WriteEventsFromValue(::opentelemetry::proto::trace::v1::Span& span, std::st
         event_proto->set_time_unix_nano(event.time_unix_nano);
 
         for (const auto& [key, value] : event.attributes) {
-            std::visit(EventAttributeWriteVisitor{*event_proto, key}, value);
+            std::visit(AttributeToTraceVisitor{*event_proto, key}, value);
         }
     }
 }
