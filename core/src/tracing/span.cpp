@@ -91,9 +91,11 @@ void HandleEventAttributes(const Span::Event& events, formats::json::StringBuild
     builder.Key("attributes");
     const formats::json::StringBuilder::ObjectGuard attributes_guard(builder);
 
+    AttributeToJsonVisitor visitor{builder};
+
     for (const auto& [key, value] : events.attributes) {
         builder.Key(key);
-        std::visit(AttributeToJsonVisitor{builder}, value);
+        std::visit(visitor, value);
     }
 }
 

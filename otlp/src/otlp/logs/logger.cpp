@@ -18,11 +18,40 @@
 
 USERVER_NAMESPACE_BEGIN
 
+namespace {
+
+constexpr std::string_view kAttributeKey = "attributes";
+
+template <typename Value>
+void GetAttributes(const Value& item, tracing::Span::Event& event) {
+    if (item.HasMember(kAttributeKey)) {
+        item[kAttributeKey].CheckObject();
+
+        for (const auto& [key, value] : formats::common::Items(item[kAttributeKey])) {
+            if (value.IsString()) {
+                event.attributes.emplace(key, value.template As<std::string>());
+            } else if (value.IsDouble()) {
+                event.attributes.emplace(key, value.template As<double>());
+            } else if (value.IsInt()) {
+                event.attributes.emplace(key, value.template As<int64_t>());
+            }
+        }
+    }
+}
+
+}  // namespace
+
 namespace formats::parse {
 
 template <typename Value>
 tracing::Span::Event Parse(const Value& value, formats::parse::To<tracing::Span::Event>) {
-    return {value["name"].template As<std::string>(), value["time_unix_nano"].template As<uint64_t>()};
+    tracing::Span::Event event{
+        value["name"].template As<std::string>(), value["time_unix_nano"].template As<uint64_t>()
+    };
+
+    GetAttributes(value, event);
+
+    return event;
 }
 
 }  // namespace formats::parse
@@ -34,7 +63,6 @@ namespace {
 constexpr std::string_view kTelemetrySdkLanguage = "telemetry.sdk.language";
 constexpr std::string_view kTelemetrySdkName = "telemetry.sdk.name";
 constexpr std::string_view kServiceName = "service.name";
-constexpr std::string_view kAttributeKey = "attributes";
 
 const std::string kTimestampFormat = "%Y-%m-%dT%H:%M:%E*S";
 
@@ -61,22 +89,6 @@ private:
     ::opentelemetry::proto::trace::v1::Span_Event& span_event_;
 };
 
-void GetAttributes(formats::json::Value item, tracing::Span::Event& event) {
-    if (item.HasMember(kAttributeKey)) {
-        item[kAttributeKey].CheckObject();
-
-        for (const auto& [key, value] : formats::common::Items(item[kAttributeKey])) {
-            if (value.IsString()) {
-                event.attributes.emplace(key, value.As<std::string>());
-            } else if (value.IsDouble()) {
-                event.attributes.emplace(key, value.As<double>());
-            } else if (value.IsInt()) {
-                event.attributes.emplace(key, value.As<int64_t>());
-            }
-        }
-    }
-}
-
 std::vector<tracing::Span::Event> GetEventsFromValue(const std::string_view value) {
     std::vector<tracing::Span::Event> events;
 
@@ -86,7 +98,6 @@ std::vector<tracing::Span::Event> GetEventsFromValue(const std::string_view valu
 
     for (const auto& item : json_value) {
         tracing::Span::Event event{item.As<tracing::Span::Event>()};
-        GetAttributes(item, event);
         events.emplace_back(std::move(event));
     }
 
