@@ -68,8 +68,8 @@ std::string GenerateSpanId() {
     return utils::encoding::ToHex(&random_value, 8);
 }
 
-struct EventAttributeWriteVisitor {
-    explicit EventAttributeWriteVisitor(formats::json::StringBuilder& builder) : builder{builder} {}
+struct AttributeToJsonVisitor {
+    explicit AttributeToJsonVisitor(formats::json::StringBuilder& builder) : builder{builder} {}
 
     template <typename T>
     void operator()(const T& value) {
@@ -93,8 +93,7 @@ void HandleEventAttributes(const Span::Event& events, formats::json::StringBuild
 
     for (const auto& [key, value] : events.attributes) {
         builder.Key(key);
-        EventAttributeWriteVisitor write_visitor(builder);
-        std::visit(write_visitor, value);
+        std::visit(AttributeToJsonVisitor{builder}, value);
     }
 }
 
