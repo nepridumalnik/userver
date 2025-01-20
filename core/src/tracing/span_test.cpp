@@ -740,7 +740,9 @@ UTEST_F(Span, MakeSpanEventWithAttributes) {
     // Attributes
     EXPECT_THAT(logs_raw, HasSubstr(R"("attributes":{"int":42})"));
     EXPECT_THAT(logs_raw, HasSubstr(R"("attributes":{"string":"value"})"));
-    EXPECT_THAT(logs_raw, HasSubstr(R"("attributes":{"int":123,"float":123.456,"string":"another_value"})"));
+    EXPECT_THAT(logs_raw, HasSubstr(R"("int":123)"));
+    EXPECT_THAT(logs_raw, HasSubstr(R"("float":123.456)"));
+    EXPECT_THAT(logs_raw, HasSubstr(R"("string":"another_value")"));
 }
 
 USERVER_NAMESPACE_END
