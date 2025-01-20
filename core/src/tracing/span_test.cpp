@@ -709,7 +709,7 @@ UTEST_F(Span, MakeSpanEvent) {
 
     const auto logs_raw = GetStreamString();
 
-    EXPECT_THAT(logs_raw, HasSubstr("events=[{\"name\":\"important_event\""));
+    EXPECT_THAT(logs_raw, HasSubstr(R"(events=[{"name":"important_event")"));
     EXPECT_THAT(logs_raw, HasSubstr("root_span"));
 }
 
@@ -732,15 +732,15 @@ UTEST_F(Span, MakeSpanEventWithAttributes) {
 
     const auto logs_raw = GetStreamString();
 
-    EXPECT_THAT(logs_raw, HasSubstr("events=[{\"name\":\"important_event_0\",\"time_unix_nano\""));
-    EXPECT_THAT(logs_raw, HasSubstr("{\"name\":\"important_event_1\",\"time_unix_nano\""));
-    EXPECT_THAT(logs_raw, HasSubstr("{\"name\":\"event_with_many_attributes\",\"time_unix_nano\""));
+    EXPECT_THAT(logs_raw, HasSubstr(R"(events=[{"name":"important_event_0","time_unix_nano")"));
+    EXPECT_THAT(logs_raw, HasSubstr(R"({"name":"important_event_1","time_unix_nano")"));
+    EXPECT_THAT(logs_raw, HasSubstr(R"({"name":"event_with_many_attributes","time_unix_nano")"));
     EXPECT_THAT(logs_raw, HasSubstr("root_span"));
 
     // Attributes
-    EXPECT_THAT(logs_raw, HasSubstr("\"attributes\":{\"int\":42}"));
-    EXPECT_THAT(logs_raw, HasSubstr("\"attributes\":{\"string\":\"value\"}"));
-    EXPECT_THAT(logs_raw, HasSubstr("\"attributes\":{\"string\":\"another_value\",\"float\":123.456,\"int\":123}"));
+    EXPECT_THAT(logs_raw, HasSubstr(R"("attributes":{"int":42})"));
+    EXPECT_THAT(logs_raw, HasSubstr(R"("attributes":{"string":"value"})"));
+    EXPECT_THAT(logs_raw, HasSubstr(R"("attributes":{"int":123,"float":123.456,"string":"another_value"})"));
 }
 
 USERVER_NAMESPACE_END
