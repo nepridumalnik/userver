@@ -699,21 +699,21 @@ UTEST_F(Span, MakeSpanWithParentIdTraceIdLinkWithExisting) {
     }
 }
 
-UTEST_F(OpentracingSpan, MakeSpanEvent) {
+UTEST_F(Span, MakeSpanEvent) {
     {
         tracing::Span root_span("root_span");
         root_span.AddEvent("important_event");
     }
 
-    FlushOpentracing();
+    logging::LogFlush();
 
-    const auto logs_raw = GetOtStreamString();
+    const auto logs_raw = GetStreamString();
 
     EXPECT_THAT(logs_raw, HasSubstr("events=[{\"name\":\"important_event\""));
     EXPECT_THAT(logs_raw, HasSubstr("root_span"));
 }
 
-UTEST_F(OpentracingSpan, MakeSpanEventWithAttributes) {
+UTEST_F(Span, MakeSpanEventWithAttributes) {
     {
         tracing::Span root_span("root_span");
         root_span.AddEvent({"important_event_0", {{"int", 42}}});
@@ -728,9 +728,9 @@ UTEST_F(OpentracingSpan, MakeSpanEventWithAttributes) {
         );
     }
 
-    FlushOpentracing();
+    logging::LogFlush();
 
-    const auto logs_raw = GetOtStreamString();
+    const auto logs_raw = GetStreamString();
 
     EXPECT_THAT(logs_raw, HasSubstr("events=[{\"name\":\"important_event_0\",\"time_unix_nano\""));
     EXPECT_THAT(logs_raw, HasSubstr("{\"name\":\"important_event_1\",\"time_unix_nano\""));
