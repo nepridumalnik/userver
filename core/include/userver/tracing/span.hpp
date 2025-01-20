@@ -37,7 +37,7 @@ public:
     /// @brief Span event -- time-stamped annotation of the span with user-provided text description.
     /// @see https://opentelemetry.io/docs/concepts/signals/traces/#span-events
     /// @see
-    /// https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/opentelemetry/proto/trace/v1/trace.proto#L222.
+    /// https://github.com/open-telemetry/opentelemetry-proto/blob/v1.3.2/opentelemetry/proto/trace/v1/trace.proto#L222.
     struct Event final {
         using Value = std::
             variant<std::string, int, long, long long, unsigned int, unsigned long, unsigned long long, float, double>;
@@ -66,9 +66,9 @@ public:
 
         /// @brief Attributes.
         /// @see
-        /// https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/opentelemetry/proto/common/v1/common.proto#L64.
+        /// https://github.com/open-telemetry/opentelemetry-proto/blob/v1.3.2/opentelemetry/proto/common/v1/common.proto#L64.
         /// @see
-        /// https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/opentelemetry/proto/trace/v1/trace.proto#L233.
+        /// https://github.com/open-telemetry/opentelemetry-proto/blob/v1.3.2/opentelemetry/proto/trace/v1/trace.proto#L233.
         /// @details Collection of unique key-value pairs.
         KeyValue attributes;
     };
