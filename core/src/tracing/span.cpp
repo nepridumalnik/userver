@@ -169,11 +169,13 @@ Span::Impl::~Impl() {
     {
         const impl::DetachLocalSpansScope ignore_local_span;
         logging::LogHelper lh{
-            logging::GetDefaultLogger(), log_level_, logging::Module{source_location_}, logging::LogClass::kTrace};
+            logging::GetDefaultLogger(), log_level_, logging::Module{source_location_}, logging::LogClass::kTrace
+        };
         std::move(*this).PutIntoLogger(lh.GetTagWriter());
     }
 }
 
+[[clang::optnone]]
 void Span::Impl::PutIntoLogger(logging::impl::TagWriter writer) && {
     const auto steady_now = std::chrono::steady_clock::now();
     const auto duration = steady_now - start_steady_time_;

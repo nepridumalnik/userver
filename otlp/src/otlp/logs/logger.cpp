@@ -171,7 +171,7 @@ void Formatter::AddTag(std::string_view key, const logging::LogExtra::Value& val
                 } else if (key == "timestamp" || key == "text") {
                     // nothing
                 } else if (key == "events") {
-                    WriteEventsFromValue(span, value);
+                    WriteEventsFromValue(span, std::get<std::string>(value));
                 } else {
                     auto attributes = span.add_attributes();
                     attributes->set_key(std::string{logger_.MapAttribute(key)});
