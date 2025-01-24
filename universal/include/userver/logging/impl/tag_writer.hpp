@@ -50,9 +50,6 @@ public:
     // The tags must not be duplicated in other Put* calls.
     void PutLogExtra(const LogExtra& extra);
 
-    // Putting events.
-    void PutEventExtra(const std::vector<LogExtra::Events>& events);
-
     // Copies the tags to the internal LogExtra. They will be deduplicated
     // automatically.
     void ExtendLogExtra(const LogExtra& extra);
