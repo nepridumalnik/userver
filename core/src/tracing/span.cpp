@@ -175,7 +175,6 @@ Span::Impl::~Impl() {
     }
 }
 
-[[clang::optnone]]
 void Span::Impl::PutIntoLogger(logging::impl::TagWriter writer) && {
     const auto steady_now = std::chrono::steady_clock::now();
     const auto duration = steady_now - start_steady_time_;

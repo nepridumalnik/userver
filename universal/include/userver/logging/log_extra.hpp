@@ -52,6 +52,40 @@ public:
     using Key = std::string;
     using Pair = std::pair<Key, Value>;
 
+    /// @brief Span event -- time-stamped annotation of the span with user-provided text description.
+    /// @see https://opentelemetry.io/docs/concepts/signals/traces/#span-events
+    /// @see
+    /// https://github.com/open-telemetry/opentelemetry-proto/blob/v1.3.2/opentelemetry/proto/trace/v1/trace.proto#L222.
+    struct Event final {
+        /// @brief Constructor.
+        /// @param name Event name.
+        explicit Event(std::string_view name);
+
+        /// @brief Constructor.
+        /// @param name Event name.
+        /// @param attributes Key-value attributes.
+        Event(std::string_view name, Pair&& attributes);
+
+        /// @brief Constructor.
+        /// @param name Event name.
+        /// @param time_unix_nano Event timestamp.
+        Event(std::string_view name, uint64_t time_unix_nano);
+
+        /// @brief Event name.
+        std::string name;
+
+        /// @brief Event timestamp.
+        uint64_t time_unix_nano{};
+
+        /// @brief Attributes.
+        /// @see
+        /// https://github.com/open-telemetry/opentelemetry-proto/blob/v1.3.2/opentelemetry/proto/common/v1/common.proto#L64.
+        /// @see
+        /// https://github.com/open-telemetry/opentelemetry-proto/blob/v1.3.2/opentelemetry/proto/trace/v1/trace.proto#L233.
+        /// @details Collection of unique key-value pairs.
+        Pair attributes;
+    };
+
     /// Specifies replacement policy for newly added values
     enum class ExtendType {
         kNormal,  ///< Added value can be replaced

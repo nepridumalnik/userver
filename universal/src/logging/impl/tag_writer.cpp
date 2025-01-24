@@ -35,6 +35,12 @@ void TagWriter::PutLogExtra(const LogExtra& extra) {
     }
 }
 
+void TagWriter::PutEventExtra(const std::vector<LogExtra::Events>& events) {
+    for (const auto& event : events) {
+        PutEvent(event);
+    }
+}
+
 void TagWriter::ExtendLogExtra(const LogExtra& extra) {
     for (const auto& item : *extra.extra_) {
         PutTag(RuntimeTagKey{item.first}, item.second.GetValue());
