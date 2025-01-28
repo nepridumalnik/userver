@@ -60,8 +60,8 @@ async def test_deadline_ok(call, client_metrics, slow_mock, timeout, deadline):
         assert response.text == 'OK!'
 
     assert client_metrics.value_at('cancelled-by-deadline', VERSION) == 0
-    assert client_metrics.value_at('errors', {'http_error': 'ok', **VERSION}) is True
-    assert client_metrics.value_at('errors', {'http_error': 'timeout', **VERSION}) is False
+    assert client_metrics.value_at('errors', {'http_error': 'ok', **VERSION}) == 1
+    assert client_metrics.value_at('errors', {'http_error': 'timeout', **VERSION}) == 0
 
 
 def get_handler_exception_logs(capture):
@@ -92,7 +92,7 @@ async def test_timeout_expired(
             assert response.text == ''
 
     assert client_metrics.value_at('cancelled-by-deadline', VERSION) == 0
-    assert client_metrics.value_at('errors', {'http_error': 'ok', **VERSION}) is False
+    assert client_metrics.value_at('errors', {'http_error': 'ok', **VERSION}) == 0
     # Client metrics are counted per attempt.
     assert client_metrics.value_at('errors', {'http_error': 'timeout', **VERSION}) == attempts
 
@@ -150,7 +150,7 @@ async def test_deadline_expired(
 
     # There might have been >1 attempts, but only 1 of them was cancelled.
     assert client_metrics.value_at('cancelled-by-deadline', VERSION) == 1
-    assert client_metrics.value_at('errors', {'http_error': 'ok', **VERSION}) is False
+    assert client_metrics.value_at('errors', {'http_error': 'ok', **VERSION}) == 0
 
     timed_out = client_metrics.value_at(
         'errors',
@@ -167,7 +167,7 @@ async def test_deadline_expired(
     assert len(logs) == 1
     assert logs[0]['error'] == 'true'
     assert logs[0]['max_attempts'] == str(attempts)
-    assert logs[0]['cancelled_by_deadline'] is True
+    assert logs[0]['cancelled_by_deadline'] == '1'
     assert logs[0]['error_msg'] == 'Timeout was reached'
     assert logs[0]['timeout_ms'] == str(timeout)
     assert 0 <= int(logs[0]['propagated_timeout_ms']) <= deadline
@@ -244,15 +244,15 @@ async def test_fake_deadline_expired(
     assert fake_deadline_expired_mock.times_called == 1
 
     assert client_metrics.value_at('cancelled-by-deadline', VERSION) == 1
-    assert client_metrics.value_at('errors', {'http_error': 'ok', **VERSION}) is False
+    assert client_metrics.value_at('errors', {'http_error': 'ok', **VERSION}) == 0
     assert client_metrics.value_at('errors', {'http_error': 'timeout', **VERSION}) == 1
 
     logs = capture.select(stopwatch_name='external')
     assert len(logs) == 1
     assert logs[0]['error'] == 'true'
-    assert logs[0]['attempts'] is True
+    assert logs[0]['attempts'] == "1"
     assert logs[0]['max_attempts'] == '3'
-    assert logs[0]['cancelled_by_deadline'] is True
+    assert logs[0]['cancelled_by_deadline'] == '1'
     assert logs[0]['error_msg'] == 'Timeout was reached'
     assert logs[0]['timeout_ms'] == '500'
     assert 200 <= int(logs[0]['propagated_timeout_ms']) <= 300
