@@ -194,36 +194,6 @@ public:
     /// future children) and logged only once in the destructor of the Span.
     void AddNonInheritableTag(std::string key, logging::LogExtra::Value value);
 
-    /// Bypass char* for old compilers.
-    template <typename T>
-    inline void AddTag(std::string key, T&& value) {
-        if constexpr (std::is_same_v<std::decay_t<T>, char*>) {
-            AddTag(std::move(key), std::string(value));
-        } else {
-            AddTag(std::move(key), std::move(value));
-        }
-    }
-
-    /// Bypass char* for old compilers.
-    template <typename T>
-    inline void AddTagFrozen(std::string key, T&& value) {
-        if constexpr (std::is_same_v<std::decay_t<T>, char*>) {
-            AddTagFrozen(std::move(key), std::string(value));
-        } else {
-            AddTagFrozen(std::move(key), std::move(value));
-        }
-    }
-
-    /// Bypass char* for old compilers.
-    template <typename T>
-    inline void AddNonInheritableTag(std::string key, T&& value) {
-        if constexpr (std::is_same_v<std::decay_t<T>, char*>) {
-            AddNonInheritableTag(std::move(key), std::string(value));
-        } else {
-            AddNonInheritableTag(std::move(key), std::move(value));
-        }
-    }
-
     /// @overload AddNonInheritableTag
     void AddNonInheritableTags(const logging::LogExtra&);
 
