@@ -11,6 +11,7 @@
 #include <boost/container/container_fwd.hpp>
 
 #include <userver/compiler/select.hpp>
+#include <userver/formats/wrappers.hpp>
 #include <userver/logging/fwd.hpp>
 #include <userver/utils/fast_pimpl.hpp>
 
@@ -48,7 +49,7 @@ public:
         unsigned long long,
         float,
         double,
-        bool>;
+        Boolean>;
     using Key = std::string;
     using Pair = std::pair<Key, Value>;
 

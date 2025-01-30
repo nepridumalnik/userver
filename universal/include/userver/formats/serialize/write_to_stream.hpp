@@ -99,6 +99,8 @@ WriteToStream(const T& value, StringBuilder& sw) {
             "allowed. Please implement WriteToStream for your type"
         );
         sw.WriteValue(Serialize(value, serialize::To<Value>{}));
+    } else if constexpr (std::is_convertible_v<T, bool>) {
+        sw.WriteBool(value);
     } else {
         static_assert(!sizeof(T), "Please implement WriteToStream or Serialize for your type");
     }
