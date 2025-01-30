@@ -103,7 +103,7 @@ UTEST_F(Span, LogFormat) {
                                                   R"(text=\n)";
     {
         tracing::Span span("span_name");
-        span.AddTag("my_tag_key", std::string("my_tag_value"));
+        span.AddTag("my_tag_key", "my_tag_value");
         span.CreateScopeTime("my_timer");
     }
     logging::LogFlush();
@@ -114,17 +114,17 @@ UTEST_F(Span, LogFormat) {
 
 UTEST_F(Span, LogBufferSize) {
     tracing::Span span("http/my-glorious-http-handler-name");
-    span.AddTag("meta_type", std::string("my-glorious-http-handler-name"));
+    span.AddTag("meta_type", "my-glorious-http-handler-name");
     span.AddTag("meta_code", 500);
-    span.AddTag("http_method", std::string("DELETE"));
-    span.AddTag("uri", std::string("https://example.com/some/modest/uri?with=some;more=args"));
-    span.AddTag("type", std::string("request"));
+    span.AddTag("http_method", "DELETE");
+    span.AddTag("uri", "https://example.com/some/modest/uri?with=some;more=args");
+    span.AddTag("type", "request");
     span.AddTag("request_body_length", 42);
-    span.AddTag("body", std::string("just some modest sample request body, not too long"));
-    span.AddTag("request_application", std::string("my-userver-service"));
-    span.AddTag("lang", std::string("en"));
-    span.AddTag("useragent", std::string("what is that?"));
-    span.AddTag("battery_type", std::string("AAAAA"));
+    span.AddTag("body", "just some modest sample request body, not too long");
+    span.AddTag("request_application", "my-userver-service");
+    span.AddTag("lang", "en");
+    span.AddTag("useragent", "what is that?");
+    span.AddTag("battery_type", "AAAAA");
 
     LOG_ERROR() << "An exception occurred in 'my-glorious-http-handler-name' "
                    "handler, we found this unacceptable thing and just couldn't "
@@ -149,7 +149,7 @@ UTEST_F(Span, SourceLocation) {
 UTEST_F(Span, Tag) {
     {
         tracing::Span span("span_name");
-        span.AddTag("k", std::string("v"));
+        span.AddTag("k", "v");
 
         logging::LogFlush();
         EXPECT_THAT(GetStreamString(), Not(HasSubstr("k=v")));
@@ -160,7 +160,7 @@ UTEST_F(Span, Tag) {
 
 UTEST_F(Span, InheritTag) {
     tracing::Span span("span_name");
-    tracing::Span::CurrentSpan().AddTag("k", std::string("v"));
+    tracing::Span::CurrentSpan().AddTag("k", "v");
 
     logging::LogFlush();
     EXPECT_THAT(GetStreamString(), Not(HasSubstr("k=v")));
@@ -185,14 +185,14 @@ UTEST_F(Span, NonInheritTag) {
 UTEST_F(OpentracingSpan, Tags) {
     {
         tracing::Span span("span_name");
-        span.AddTag("k", std::string("v"));
+        span.AddTag("k", "v");
         span.AddTag("meta_code", 200);
         span.AddTag("error", false);
-        span.AddTag("method", std::string("POST"));
-        span.AddTag("db.type", std::string("postgres"));
-        span.AddTag("db.statement", std::string("SELECT * "));
-        span.AddTag("peer.address", std::string("127.0.0.1:8080"));
-        span.AddTag("http.url", std::string("http://example.com/example"));
+        span.AddTag("method", "POST");
+        span.AddTag("db.type", "postgres");
+        span.AddTag("db.statement", "SELECT * ");
+        span.AddTag("peer.address", "127.0.0.1:8080");
+        span.AddTag("http.url", "http://example.com/example");
     }
     FlushOpentracing();
     const auto log_str = GetOtStreamString();
@@ -222,7 +222,7 @@ UTEST_F(OpentracingSpan, TagFormat) {
         tracing::Span span("span_name");
         span.AddTag("meta_code", 200);
         span.AddTag("error", false);
-        span.AddTag("method", std::string("POST"));
+        span.AddTag("method", "POST");
     }
     FlushOpentracing();
     const auto tags = GetTagsJson(GetOtStreamString());
@@ -347,7 +347,7 @@ UTEST_F(Span, LowerLocalLogLevel) {
     {
         tracing::Span span("logged_span");
         span.SetLocalLogLevel(logging::Level::kInfo);
-        span.AddTag("test_tag", std::string("test_value1"));
+        span.AddTag("test_tag", "test_value1");
 
         LOG_INFO() << "simplelog";
         logging::LogFlush();
@@ -609,8 +609,8 @@ UTEST_F(Span, ForeignSpan) {
 UTEST_F(Span, DocsData) {
     {  /// [Example using Span tracing]
         tracing::Span span("big block");
-        span.AddTag("tag", std::string("simple tag that can be changed in subspan"));
-        span.AddTagFrozen("frozen", std::string("it is not possible to change this tag value in subspan"));
+        span.AddTag("tag", "simple tag that can be changed in subspan");
+        span.AddTagFrozen("frozen", "it is not possible to change this tag value in subspan");
         span.AddNonInheritableTag("local", "this tag is not visible in subspans");
         /// [Example using Span tracing]
     }
@@ -618,7 +618,7 @@ UTEST_F(Span, DocsData) {
         std::string user = "user";
         /// [Example span hierarchy]
         tracing::Span span("big block");
-        span.AddTag("city", std::string("moscow"));
+        span.AddTag("city", "moscow");
 
         LOG_INFO() << "User " << user << " logged in";  // logs "city" tag
 
@@ -634,7 +634,7 @@ UTEST_F(Span, DocsData) {
     {
         /// [Example get current span]
 
-        tracing::Span::CurrentSpan().AddTag("key", std::string("value"));
+        tracing::Span::CurrentSpan().AddTag("key", "value");
 
         /// [Example get current span]
     }
@@ -736,7 +736,6 @@ UTEST_F(Span, MakeSpanEventWithAttributes) {
                  {"string", "another_value"},
                  {"int", 123},
                  {"float", 123.456},
-                 {"bool", true},
              }}
         );
     }

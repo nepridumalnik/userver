@@ -59,9 +59,7 @@ UTEST_F(TagScopeTest, AutomaticSpanFindingFrozen) {
 
 UTEST_F(TagScopeTest, MissedItsScope) {
     tracing::Span myspan{"myspan"};
-    {
-        const tracing::TagScope tag{myspan, "key", std::string("value")};
-    }
+    { const tracing::TagScope tag{myspan, "key", "value"}; }
 
     LOG_INFO() << "1";
     logging::LogFlush();
@@ -72,9 +70,7 @@ UTEST_F(TagScopeTest, MissedItsScope) {
 
 UTEST_F(TagScopeTest, MissedItsScopeFrozen) {
     tracing::Span myspan{"myspan"};
-    {
-        const tracing::TagScope tag{myspan, "key", "value", logging::LogExtra::ExtendType::kFrozen};
-    }
+    { const tracing::TagScope tag{myspan, "key", "value", logging::LogExtra::ExtendType::kFrozen}; }
 
     LOG_INFO() << "1";
     logging::LogFlush();
@@ -86,7 +82,7 @@ UTEST_F(TagScopeTest, MissedItsScopeFrozen) {
 UTEST_F(TagScopeTest, DestructorRollbacksToPreviousValue) {
     /// [TagScope - sample]
     tracing::Span myspan{"myspan"};
-    myspan.AddTag("key", std::string("value"));
+    myspan.AddTag("key", "value");
     {
         const tracing::TagScope tag{myspan, "key", "2value2"};
 
@@ -108,7 +104,7 @@ UTEST_F(TagScopeTest, DestructorRollbacksToPreviousValue) {
 
 UTEST_F(TagScopeTest, DestructorRollbacksToPreviousValueFrozen) {
     tracing::Span myspan{"myspan"};
-    myspan.AddTag("key", std::string("value"));
+    myspan.AddTag("key", "value");
     {
         const tracing::TagScope tag{myspan, "key", "2value2", logging::LogExtra::ExtendType::kFrozen};
 
@@ -129,7 +125,7 @@ UTEST_F(TagScopeTest, DestructorRollbacksToPreviousValueFrozen) {
 
 UTEST_F(TagScopeTest, AttemptToOverwriteFrozenTag) {
     tracing::Span myspan{"myspan"};
-    myspan.AddTagFrozen("key", std::string("value"));
+    myspan.AddTagFrozen("key", "value");
     {
         const tracing::TagScope ignored{myspan, "key", "value2"};
         LOG_INFO() << "1";
@@ -149,7 +145,7 @@ UTEST_F(TagScopeTest, AttemptToOverwriteFrozenTag) {
 
 UTEST_F(TagScopeTest, AttemptToOverwriteFrozenTagFrozen) {
     tracing::Span myspan{"myspan"};
-    myspan.AddTagFrozen("key", std::string("value"));
+    myspan.AddTagFrozen("key", "value");
     {
         const tracing::TagScope ignored{myspan, "key", "value2", logging::LogExtra::ExtendType::kFrozen};
         LOG_INFO() << "1";
@@ -183,7 +179,7 @@ UTEST_F(TagScopeTest, RegularTagBroken) {
     tracing::Span myspan{"myspan"};
     {
         const tracing::TagScope tag{"key", "value"};
-        myspan.AddTag("key", std::string("another_value"));
+        myspan.AddTag("key", "another_value");
     }
     LOG_INFO() << "1";
     logging::LogFlush();
@@ -195,13 +191,13 @@ UTEST_F(TagScopeTest, RegularTagBroken) {
 
 UTEST_F(TagScopeTest, RegularTagBrokenDouble) {
     tracing::Span myspan{"myspan"};
-    myspan.AddTag("key", std::string("value"));
+    myspan.AddTag("key", "value");
     {
-        const tracing::TagScope tag1{"key", std::string("2value2")};
-        myspan.AddTag("key", std::string("3value3"));
+        const tracing::TagScope tag1{"key", "2value2"};
+        myspan.AddTag("key", "3value3");
         {
             const tracing::TagScope tag2{"key", "4value4"};
-            myspan.AddTag("key", std::string("5value5"));
+            myspan.AddTag("key", "5value5");
 
             LOG_INFO() << "1";
             logging::LogFlush();
@@ -239,7 +235,7 @@ UTEST_F(TagScopeTest, NewRegularTagInScope) {
     tracing::Span myspan{"myspan"};
     {
         const tracing::TagScope tag{"key", "value"};
-        myspan.AddTag("foo", std::string("bar"));
+        myspan.AddTag("foo", "bar");
 
         LOG_INFO() << "1";
         logging::LogFlush();
@@ -260,10 +256,10 @@ UTEST_F(TagScopeTest, NewRegularTagInScopeDouble) {
     tracing::Span myspan{"myspan"};
     {
         const tracing::TagScope tag1{"key", "value"};
-        myspan.AddTag("foo", std::string("bar"));
+        myspan.AddTag("foo", "bar");
         {
             const tracing::TagScope tag2{"key", "2value2"};
-            myspan.AddTag("baz", std::string("zoo"));
+            myspan.AddTag("baz", "zoo");
 
             LOG_INFO() << "1";
             logging::LogFlush();
@@ -333,8 +329,7 @@ UTEST_F(TagScopeTest, RegularTriesToOverwriteFrozen) {
 UTEST_F(TagScopeTest, BasicLogExtra) {
     tracing::Span myspan{"myspan"};
     const tracing::TagScope tag_scope{
-        myspan, logging::LogExtra{std::make_pair("key", "value"), std::make_pair("foo", 123)}
-    };
+        myspan, logging::LogExtra{std::make_pair("key", "value"), std::make_pair("foo", 123)}};
 
     LOG_INFO() << "1";
     logging::LogFlush();
@@ -349,8 +344,7 @@ UTEST_F(TagScopeTest, BasicLogExtraFrozen) {
         myspan,
         logging::LogExtra(
             {std::make_pair("key", "value"), std::make_pair("foo", 123)}, logging::LogExtra::ExtendType::kFrozen
-        )
-    };
+        )};
 
     LOG_INFO() << "1";
     logging::LogFlush();
@@ -374,10 +368,9 @@ UTEST_F(TagScopeTest, DestructorRollbacksToPreviousValueLogExtra) {
     tracing::Span myspan{"myspan"};
     myspan.AddTag("foo", 123);
     {
-        myspan.AddTag("key", std::string("value"));
+        myspan.AddTag("key", "value");
         const tracing::TagScope tag_scope{
-            myspan, logging::LogExtra{std::make_pair("key", "2value2"), std::make_pair("foo", 321)}
-        };
+            myspan, logging::LogExtra{std::make_pair("key", "2value2"), std::make_pair("foo", 321)}};
     }
     LOG_INFO() << "1";
     logging::LogFlush();
@@ -391,11 +384,9 @@ UTEST_F(TagScopeTest, DestructorRollbacksToPreviousValueLogExtra) {
 UTEST_F(TagScopeTest, ForgetLogExtra) {
     tracing::Span myspan{"myspan"};
     const tracing::TagScope forgotten_tag_scope{
-        myspan, logging::LogExtra{std::make_pair("key", "value"), std::make_pair("foo", 123)}
-    };
+        myspan, logging::LogExtra{std::make_pair("key", "value"), std::make_pair("foo", 123)}};
     const tracing::TagScope overwriting_tag_scope{
-        myspan, logging::LogExtra{std::make_pair("key", "2value2"), std::make_pair("foo", 321)}
-    };
+        myspan, logging::LogExtra{std::make_pair("key", "2value2"), std::make_pair("foo", 321)}};
 
     LOG_INFO() << "1";
     logging::LogFlush();
@@ -409,10 +400,10 @@ UTEST_F(TagScopeTest, ForgetLogExtra) {
 UTEST_F(TagScopeTest, RegularTagBrokenLogExtra) {
     tracing::Span myspan{"myspan"};
     {
-        const tracing::TagScope tag_scope{logging::LogExtra{std::make_pair("key", "value"), std::make_pair("foo", 123)}
-        };
-        myspan.AddTag("key", std::string("another_value"));
-        myspan.AddTagFrozen("foo", std::string("bar"));
+        const tracing::TagScope tag_scope{
+            logging::LogExtra{std::make_pair("key", "value"), std::make_pair("foo", 123)}};
+        myspan.AddTag("key", "another_value");
+        myspan.AddTagFrozen("foo", "bar");
     }
     LOG_INFO() << "1";
     logging::LogFlush();
