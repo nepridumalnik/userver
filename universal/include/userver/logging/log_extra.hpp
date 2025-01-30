@@ -35,20 +35,8 @@ class TagWriter;
 /// Extra tskv fields storage
 class LogExtra final {
 public:
-    /// @brief The value is one of the listed fields.
-    /// @see
-    /// https://github.com/open-telemetry/opentelemetry-proto/blob/v1.3.2/opentelemetry/proto/common/v1/common.proto#L28
-    using Value = std::variant<
-        std::string,
-        int,
-        long,
-        long long,
-        unsigned int,
-        unsigned long,
-        unsigned long long,
-        float,
-        double,
-        bool>;
+    using Value =
+        std::variant<std::string, int, long, long long, unsigned int, unsigned long, unsigned long long, float, double>;
     using Key = std::string;
     using Pair = std::pair<Key, Value>;
 
