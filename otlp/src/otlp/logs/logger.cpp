@@ -297,15 +297,15 @@ void Logger::SetAttributeValue(
 ) {
     std::visit(
         utils::Overloaded{
-            [destination](const Boolean& x) { destination->set_bool_value(x); },
-            [destination](int x) { destination->set_int_value(x); },
-            [destination](long x) { destination->set_int_value(x); },
-            [destination](unsigned int x) { destination->set_int_value(x); },
-            [destination](unsigned long x) { destination->set_int_value(x); },
-            [destination](long long x) { destination->set_int_value(x); },
-            [destination](unsigned long long x) { destination->set_int_value(x); },
-            [destination](double x) { destination->set_double_value(x); },
-            [destination](const std::string& x) { destination->set_string_value(x); }
+            [&](bool x) { destination->set_bool_value(x); },
+            [&](int x) { destination->set_int_value(x); },
+            [&](long x) { destination->set_int_value(x); },
+            [&](unsigned int x) { destination->set_int_value(x); },
+            [&](unsigned long x) { destination->set_int_value(x); },
+            [&](long long x) { destination->set_int_value(x); },
+            [&](unsigned long long x) { destination->set_int_value(x); },
+            [&](double x) { destination->set_double_value(x); },
+            [&](const std::string& x) { destination->set_string_value(x); }
         },
         value
     );
