@@ -384,10 +384,6 @@ void Span::AddNonInheritableTag(std::string key, logging::LogExtra::Value value)
     pimpl_->log_extra_local_->Extend(std::move(key), std::move(value));
 }
 
-void Span::AddNonInheritableTag(std::string key, const char* value) {
-    AddNonInheritableTag(std::move(key), std::string(value));
-}
-
 void Span::AddNonInheritableTags(const logging::LogExtra& log_extra) {
     if (!pimpl_->log_extra_local_) pimpl_->log_extra_local_.emplace();
     pimpl_->log_extra_local_->Extend(log_extra);
@@ -408,8 +404,6 @@ void Span::AddTag(std::string key, logging::LogExtra::Value value) {
     pimpl_->log_extra_inheritable_.Extend(std::move(key), std::move(value));
 }
 
-void Span::AddTag(std::string key, const char* value) { AddTag(std::move(key), std::string(value)); }
-
 void Span::AddTags(const logging::LogExtra& log_extra, utils::impl::InternalTag) {
     pimpl_->log_extra_inheritable_.Extend(log_extra);
 }
@@ -428,8 +422,6 @@ std::string Span::GetTag(std::string_view tag) const {
 void Span::AddTagFrozen(std::string key, logging::LogExtra::Value value) {
     pimpl_->log_extra_inheritable_.Extend(std::move(key), std::move(value), logging::LogExtra::ExtendType::kFrozen);
 }
-
-void Span::AddTagFrozen(std::string key, const char* value) { AddTagFrozen(std::move(key), std::string(value)); }
 
 void Span::AddEvent(std::string_view event_name) { pimpl_->events_.emplace_back(event_name); }
 

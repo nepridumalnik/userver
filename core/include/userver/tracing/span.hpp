@@ -186,22 +186,13 @@ public:
     /// future children.
     void AddTag(std::string key, logging::LogExtra::Value value);
 
-    /// Add a tag for const char* to bypass old GCC`s restriction.
-    void AddTag(std::string key, const char* value);
-
     /// Add a tag that is used on each logging in this Span and all
     /// future children. It will not be possible to change its value.
     void AddTagFrozen(std::string key, logging::LogExtra::Value value);
 
-    /// Add a tag for const char* to bypass old GCC`s restriction.
-    void AddTagFrozen(std::string key, const char* value);
-
     /// Add a tag that is local to the Span (IOW, it is not propagated to
     /// future children) and logged only once in the destructor of the Span.
     void AddNonInheritableTag(std::string key, logging::LogExtra::Value value);
-
-    /// Add a tag for const char* to bypass old GCC`s restriction.
-    void AddNonInheritableTag(std::string key, const char* value);
 
     /// @overload AddNonInheritableTag
     void AddNonInheritableTags(const logging::LogExtra&);
