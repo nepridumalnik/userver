@@ -38,6 +38,7 @@ public:
     /// @brief The value is one of the listed fields.
     /// @see
     /// https://github.com/open-telemetry/opentelemetry-proto/blob/v1.3.2/opentelemetry/proto/common/v1/common.proto#L28
+    /// @warning On old versions of GCC such as 8 and 9, the compiler may cast bool to int const char * to bool
     using Value = std::variant<
         std::string,
         int,
