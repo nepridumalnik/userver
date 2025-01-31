@@ -98,10 +98,10 @@ async def test_timeout_expired(
 
     logs = capture.select(stopwatch_name='external')
     assert len(logs) == 1
-    assert logs[0]['error'] == 'true'
+    assert logs[0]['error'] == '1'
     assert logs[0]['attempts'] == str(attempts)
     assert logs[0]['max_attempts'] == str(attempts)
-    assert logs[0].get('cancelled_by_deadline', False) is False
+    assert logs[0].get('cancelled_by_deadline', '0') == '0'
     assert logs[0]['error_msg'] == 'Timeout was reached'
     assert logs[0]['timeout_ms'] == str(timeout)
     assert logs[0]['propagated_timeout_ms'] == str(timeout)
@@ -165,7 +165,7 @@ async def test_deadline_expired(
 
     logs = capture.select(stopwatch_name='external')
     assert len(logs) == 1
-    assert logs[0]['error'] == 'true'
+    assert logs[0]['error'] == '1'
     assert logs[0]['max_attempts'] == str(attempts)
     assert logs[0]['cancelled_by_deadline'] == '1'
     assert logs[0]['error_msg'] == 'Timeout was reached'
@@ -249,8 +249,8 @@ async def test_fake_deadline_expired(
 
     logs = capture.select(stopwatch_name='external')
     assert len(logs) == 1
-    assert logs[0]['error'] == 'true'
-    assert logs[0]['attempts'] == "1"
+    assert logs[0]['error'] == '1'
+    assert logs[0]['attempts'] == '1'
     assert logs[0]['max_attempts'] == '3'
     assert logs[0]['cancelled_by_deadline'] == '1'
     assert logs[0]['error_msg'] == 'Timeout was reached'
